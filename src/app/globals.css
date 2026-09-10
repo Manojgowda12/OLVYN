@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b0f19;
+  --foreground: #f8fafc;
+  --card: #131b2e;
+  --card-border: #1e293b;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --accent: #8b5cf6;
+  --muted: #94a3b8;
+  --border: #1e293b;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Typography styles */
+.prose-dark {
+  color: #cbd5e1;
+  line-height: 1.75;
+}
+
+.prose-dark h1,
+.prose-dark h2,
+.prose-dark h3,
+.prose-dark h4 {
+  color: #f8fafc;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-dark h1 { font-size: 1.875rem; }
+.prose-dark h2 { font-size: 1.5rem; }
+.prose-dark h3 { font-size: 1.25rem; }
+
+.prose-dark p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose-dark code {
+  background-color: #1e293b;
+  color: #38bdf8;
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.prose-dark pre {
+  background-color: #0d1322;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.prose-dark pre code {
+  background-color: transparent;
+  color: #e2e8f0;
+  padding: 0;
+}
+
+.prose-dark ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.prose-dark ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.prose-dark blockquote {
+  border-left: 3px solid #3b82f6;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #94a3b8;
+  font-style: italic;
+}
