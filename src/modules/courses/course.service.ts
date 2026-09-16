@@ -24,7 +24,7 @@ export async function getPublishedCourses(params: CourseFilterParams = {}) {
   }
 
   if (difficulty && difficulty !== "all") {
-    whereClause.difficulty = difficulty;
+    whereClause.difficulty = difficulty as any;
   }
 
   if (query && query.trim().length > 0) {

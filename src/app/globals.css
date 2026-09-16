@@ -1,109 +1,217 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --background: #0b0f19;
-  --foreground: #f8fafc;
-  --card: #131b2e;
-  --card-border: #1e293b;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --accent: #8b5cf6;
-  --muted: #94a3b8;
-  --border: #1e293b;
+  /* High-Contrast Neon Lime & Deep Charcoal Palette */
+  --lime: #d2f835;
+  --lime-hover: #c4ec23;
+  --lime-subtle: #f4fde0;
+  
+  --dark-bg: #121417;
+  --dark-surface: #1a1d21;
+  --dark-card: #22262b;
+  --dark-border: #2e333a;
+
+  /* Light Canvas & Ink */
+  --canvas: #f6f8f5;
+  --surface-card: #ffffff;
+  --ink-primary: #121417;
+  --ink-secondary: #475467;
+  --ink-muted: #667085;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background-color: var(--canvas);
+  color: var(--ink-primary);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.018em;
 }
 
-/* Custom scrollbar */
+/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #ffffff;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: #dddddd;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #c1c1c1;
 }
 
-/* Typography styles */
-.prose-dark {
-  color: #cbd5e1;
-  line-height: 1.75;
+/* Single System Shadow Tier (Airbnb Hover & Dropdown Elevation) */
+.airbnb-shadow {
+  box-shadow: rgba(0, 0, 0, 0.02) 0 0 0 1px, rgba(0, 0, 0, 0.04) 0 2px 6px 0, rgba(0, 0, 0, 0.1) 0 4px 8px 0;
 }
 
-.prose-dark h1,
-.prose-dark h2,
-.prose-dark h3,
-.prose-dark h4 {
-  color: #f8fafc;
+.airbnb-shadow-hover:hover {
+  box-shadow: rgba(0, 0, 0, 0.02) 0 0 0 1px, rgba(0, 0, 0, 0.06) 0 4px 12px 0, rgba(0, 0, 0, 0.12) 0 8px 16px 0;
+}
+
+/* Typography Scale */
+.airbnb-display-xl {
+  font-size: 28px;
   font-weight: 700;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
+  line-height: 1.43;
+  color: #222222;
 }
 
-.prose-dark h1 { font-size: 1.875rem; }
-.prose-dark h2 { font-size: 1.5rem; }
-.prose-dark h3 { font-size: 1.25rem; }
-
-.prose-dark p {
-  margin-top: 0.75em;
-  margin-bottom: 0.75em;
+.airbnb-display-lg {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.44px;
+  color: #222222;
 }
 
-.prose-dark code {
-  background-color: #1e293b;
-  color: #38bdf8;
-  padding: 0.2em 0.4em;
-  border-radius: 0.25rem;
-  font-size: 0.875em;
+.airbnb-display-md {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.43;
+  color: #222222;
 }
 
-.prose-dark pre {
-  background-color: #0d1322;
-  border: 1px solid #1e293b;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  overflow-x: auto;
-  margin: 1rem 0;
+.airbnb-title-md {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #222222;
 }
 
-.prose-dark pre code {
-  background-color: transparent;
-  color: #e2e8f0;
-  padding: 0;
+.airbnb-title-sm {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #222222;
 }
 
-.prose-dark ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  margin: 0.75rem 0;
+.airbnb-body-md {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #3f3f3f;
 }
 
-.prose-dark ol {
-  list-style-type: decimal;
-  padding-left: 1.5rem;
-  margin: 0.75rem 0;
+.airbnb-body-sm {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.43;
+  color: #6a6a6a;
 }
 
-.prose-dark blockquote {
-  border-left: 3px solid #3b82f6;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  color: #94a3b8;
-  font-style: italic;
+.airbnb-caption {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.29;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #222222;
+}
+
+/* Airbnb Rausch Primary Button */
+.airbnb-btn-primary {
+  background-color: #ff385c;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.airbnb-btn-primary:hover {
+  background-color: #e00b41;
+}
+
+.airbnb-btn-primary:active {
+  background-color: #e00b41;
+}
+
+/* Secondary Button */
+.airbnb-btn-secondary {
+  background-color: #ffffff;
+  color: #222222;
+  border: 1px solid #222222;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.airbnb-btn-secondary:hover {
+  background-color: #f7f7f7;
+}
+
+/* Search Bar Pill & Orb */
+.airbnb-search-pill {
+  background-color: #ffffff;
+  border-radius: 9999px;
+  border: 1px solid #dddddd;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 1px 2px, rgba(0, 0, 0, 0.05) 0 4px 12px;
+  transition: box-shadow 0.2s ease;
+}
+
+.airbnb-search-pill:hover {
+  box-shadow: rgba(0, 0, 0, 0.12) 0 2px 4px, rgba(0, 0, 0, 0.08) 0 6px 16px;
+}
+
+.airbnb-search-orb {
+  background-color: #ff385c;
+  color: #ffffff;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.airbnb-search-orb:hover {
+  background-color: #e00b41;
+}
+
+/* Guest / Learner Favorite Badge */
+.airbnb-badge {
+  background-color: #ffffff;
+  color: #222222;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 2px 4px;
+}
+
+/* Circular Icon Button (Heart, Controls) */
+.airbnb-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.airbnb-icon-btn:hover {
+  transform: scale(1.1);
 }

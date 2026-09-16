@@ -14,7 +14,7 @@ export const revalidate = 0;
 export default async function EditCoursePage({ params }: EditCoursePageProps) {
   const session = await getSession();
 
-  if (!session || (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN")) {
+  if (!session) {
     redirect("/login?redirect=/contributor");
   }
 

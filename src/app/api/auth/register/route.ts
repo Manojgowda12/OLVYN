@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
     const user = await db.user.create({
       data: {
         email: email.toLowerCase(),
+        normalizedEmail: email.toLowerCase(),
         passwordHash,
         name,
         role: "LEARNER",

@@ -1,0 +1,604 @@
+{
+  "exportedAt": "2026-09-16T15:11:32.611Z",
+  "counts": {
+    "users": 3,
+    "categories": 5,
+    "tags": 8,
+    "courseTags": 5,
+    "courses": 7,
+    "modules": 10,
+    "lessons": 12,
+    "resources": 0,
+    "enrollments": 1,
+    "lessonProgress": 2,
+    "courseProgress": 1,
+    "courseReviews": 0
+  },
+  "data": {
+    "users": [
+      {
+        "id": "cmu3vbwxz0000ubs4awktsr6c",
+        "email": "admin@openlearner.ai",
+        "passwordHash": "$2b$10$LuSFJlBDx6Q0r8qS8E.Xdu3rEDR/7H7pprdAdzE3h5q3hzv.cNL8G",
+        "name": "Platform Administrator",
+        "role": "ADMIN",
+        "bio": "Chief editorial lead and platform moderator.",
+        "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
+        "createdAt": "2026-09-16T08:58:22.728Z",
+        "updatedAt": "2026-09-16T08:58:22.728Z"
+      },
+      {
+        "id": "cmu3vbwzk0001ubs4is77nf8p",
+        "email": "contributor@openlearner.ai",
+        "passwordHash": "$2b$10$r2SKHDDjJWsKzQBWdlnyhOiy6ked4GBQcxhuAJ0DxYiVu/wAu9DvS",
+        "name": "Sarah Jenkins",
+        "role": "CONTRIBUTOR",
+        "bio": "Senior Software Engineer & Open Source Educator with 8+ years of teaching experience.",
+        "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80",
+        "createdAt": "2026-09-16T08:58:22.784Z",
+        "updatedAt": "2026-09-16T08:58:22.784Z"
+      },
+      {
+        "id": "cmu3vbwzt0002ubs4skry1mm6",
+        "email": "learner@openlearner.ai",
+        "passwordHash": "$2b$10$FkU/UfwAA9ofCKfap.XT9.7g7ynoVqb8lP2LriwfyPmIEQml3191i",
+        "name": "Alex Chen",
+        "role": "LEARNER",
+        "bio": "Lifelong learner curious about programming and user experience.",
+        "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80",
+        "createdAt": "2026-09-16T08:58:22.793Z",
+        "updatedAt": "2026-09-16T08:58:22.793Z"
+      }
+    ],
+    "categories": [
+      {
+        "id": "cmu3vbx030003ubs40p48rn0u",
+        "name": "Programming & Technology",
+        "slug": "programming-technology",
+        "description": "Learn coding, web development, software architecture, and systems.",
+        "icon": "Code",
+        "createdAt": "2026-09-16T08:58:22.804Z"
+      },
+      {
+        "id": "cmu3vbx0f0004ubs4c3pfgkhc",
+        "name": "Data Science & AI",
+        "slug": "data-science-ai",
+        "description": "Explore machine learning, neural networks, analytics, and data engineering.",
+        "icon": "Cpu",
+        "createdAt": "2026-09-16T08:58:22.815Z"
+      },
+      {
+        "id": "cmu3vbx0o0005ubs4efnlmbic",
+        "name": "Design & UX",
+        "slug": "design-ux",
+        "description": "Master user research, interface aesthetics, typography, and wireframing.",
+        "icon": "Palette",
+        "createdAt": "2026-09-16T08:58:22.824Z"
+      },
+      {
+        "id": "cmu3vbx100006ubs4cbeczkme",
+        "name": "Business & Finance",
+        "slug": "business-finance",
+        "description": "Build startups, manage products, understand accounting, and make smart investments.",
+        "icon": "TrendingUp",
+        "createdAt": "2026-09-16T08:58:22.837Z"
+      },
+      {
+        "id": "cmu3vbx1b0007ubs4yvt25cg1",
+        "name": "Mathematics & Science",
+        "slug": "mathematics-science",
+        "description": "Develop deep analytical thinking through calculus, linear algebra, and physics.",
+        "icon": "Compass",
+        "createdAt": "2026-09-16T08:58:22.847Z"
+      }
+    ],
+    "tags": [
+      {
+        "id": "cmu3vbx1m0008ubs42dbo6e7j",
+        "name": "Python",
+        "slug": "python"
+      },
+      {
+        "id": "cmu3vbx1w0009ubs4u6rlti54",
+        "name": "JavaScript",
+        "slug": "javascript"
+      },
+      {
+        "id": "cmu3vbx25000aubs4axjk6q36",
+        "name": "TypeScript",
+        "slug": "typescript"
+      },
+      {
+        "id": "cmu3vbx2f000bubs4biqjeurq",
+        "name": "React",
+        "slug": "react"
+      },
+      {
+        "id": "cmu3vbx2n000cubs4zdff2v1u",
+        "name": "Next.js",
+        "slug": "next-js"
+      },
+      {
+        "id": "cmu3vbx2y000dubs4norfjue1",
+        "name": "UI/UX",
+        "slug": "ui-ux"
+      },
+      {
+        "id": "cmu3vbx37000eubs4zmrt4nod",
+        "name": "Beginner",
+        "slug": "beginner"
+      },
+      {
+        "id": "cmu3vbx3h000fubs4megjrzzg",
+        "name": "Open Source",
+        "slug": "open-source"
+      }
+    ],
+    "courseTags": [
+      {
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "tagId": "cmu3vbx1m0008ubs42dbo6e7j"
+      },
+      {
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "tagId": "cmu3vbx37000eubs4zmrt4nod"
+      },
+      {
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "tagId": "cmu3vbx3h000fubs4megjrzzg"
+      },
+      {
+        "courseId": "cmu3vbx6i000zubs4zp1742jo",
+        "tagId": "cmu3vbx2y000dubs4norfjue1"
+      },
+      {
+        "courseId": "cmu3vbx6i000zubs4zp1742jo",
+        "tagId": "cmu3vbx37000eubs4zmrt4nod"
+      }
+    ],
+    "courses": [
+      {
+        "id": "cmu3vbx3t000hubs4q6xwmk9t",
+        "title": "Python Fundamentals for Beginners",
+        "slug": "python-fundamentals-for-beginners",
+        "shortSummary": "A gentle, project-driven introduction to Python programming from variables to functions.",
+        "description": "# Python Fundamentals for Beginners\n\nWelcome to the most beginner-friendly guide to learning Python. Whether your goal is to automate daily tasks, analyze datasets, build web applications, or venture into Artificial Intelligence, Python is the gold standard starter language.\n\n### What You Will Learn\n- Fundamental programming syntax and core data types\n- Conditional logic, decision trees, and looping mechanisms\n- Functions, scope, modular code organization, and return values\n- How to write clean, idiomatic Python code\n\n### Prerequisites\nNone! No prior programming experience required.",
+        "difficulty": "BEGINNER",
+        "language": "English",
+        "estimatedHours": 4.5,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=800&auto=format&fit=crop&q=80",
+        "status": "PUBLISHED",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx030003ubs40p48rn0u",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:22.937Z",
+        "updatedAt": "2026-09-16T08:58:22.937Z",
+        "publishedAt": "2026-09-16T08:58:22.934Z"
+      },
+      {
+        "id": "cmu3vbx6i000zubs4zp1742jo",
+        "title": "Foundations of UI/UX Design",
+        "slug": "foundations-of-ui-ux-design",
+        "shortSummary": "Master visual hierarchy, color theory, typography, and human-centered design principles.",
+        "description": "# Foundations of UI/UX Design\n\nGood design is invisible. Great digital products don't just look visually pleasing—they make complex tasks effortless for users.\n\n### Course Highlights:\n- Learn the difference between User Interface (UI) and User Experience (UX)\n- Master the laws of Visual Hierarchy (Fitts's Law, Hick's Law, Gestalt Principles)\n- Understand color harmony, typography pairing, and accessibility standards (WCAG 2.1)\n- Wireframing and rapid prototyping concepts",
+        "difficulty": "ALL_LEVELS",
+        "language": "English",
+        "estimatedHours": 3,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80",
+        "status": "PUBLISHED",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx0o0005ubs4efnlmbic",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:23.034Z",
+        "updatedAt": "2026-09-16T08:58:23.034Z",
+        "publishedAt": "2026-09-16T08:58:23.032Z"
+      },
+      {
+        "id": "cmu3vbx7m0015ubs4kjxb9bel",
+        "title": "Web Development Essentials: HTML, CSS & JavaScript",
+        "slug": "web-development-essentials",
+        "shortSummary": "Master semantic HTML5, modern CSS flexbox layouts, and core JavaScript DOM manipulation.",
+        "description": "# Web Development Essentials\nMaster the fundamental trio of web technologies that power modern internet experiences: HTML5 for document structure, CSS3 for responsive styling and flexbox grids, and modern JavaScript (ES6+) for interactive DOM manipulation and asynchronous data fetching.\n\n### Learning Objectives:\n- Structure accessible web documents with semantic HTML5 tags\n- Create responsive layouts using Flexbox, CSS Grid, and media queries\n- Manipulate the browser Document Object Model (DOM) dynamically with JavaScript\n- Fetch remote JSON data via REST APIs using async/await",
+        "difficulty": "BEGINNER",
+        "language": "English",
+        "estimatedHours": 5,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&auto=format&fit=crop&q=80",
+        "status": "PUBLISHED",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx030003ubs40p48rn0u",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:23.074Z",
+        "updatedAt": "2026-09-16T08:58:23.074Z",
+        "publishedAt": "2026-09-16T08:58:23.072Z"
+      },
+      {
+        "id": "cmu3vbx8y001fubs4ik5tw8i6",
+        "title": "Applied Data Science & Machine Learning with Python",
+        "slug": "applied-data-science-machine-learning",
+        "shortSummary": "Wrangle real-world data with Pandas & NumPy, plot trends, and train scikit-learn models.",
+        "description": "# Applied Data Science & Machine Learning\nTurn raw data into actionable insights and predictive models. Learn data cleansing, exploratory data analysis (EDA), statistical visualization, and core supervised learning algorithms.\n\n### Curriculum Overview:\n- Vectorized computing and matrix algebra with NumPy\n- Dataframe wrangling, filtering, and aggregation with Pandas\n- Visualizing distributions with Matplotlib & Seaborn\n- Building classification and regression models with Scikit-Learn",
+        "difficulty": "INTERMEDIATE",
+        "language": "English",
+        "estimatedHours": 6.5,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80",
+        "status": "PUBLISHED",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx0f0004ubs4c3pfgkhc",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:23.122Z",
+        "updatedAt": "2026-09-16T08:58:23.122Z",
+        "publishedAt": "2026-09-16T08:58:23.120Z"
+      },
+      {
+        "id": "cmu3vbx9t001lubs4lshksl3u",
+        "title": "Discrete Mathematics & Algorithm Design",
+        "slug": "discrete-mathematics-algorithms",
+        "shortSummary": "Logic, set theory, combinatorics, and asymptotic complexity analysis for computer scientists.",
+        "description": "# Discrete Mathematics & Algorithm Design\nThe mathematical foundation behind computer algorithms, data structures, and cryptography.\n\n### Topics Covered:\n- Propositional and predicate logic, truth tables, and boolean algebra\n- Sets, relations, functions, and graph theory basics\n- Asymptotic analysis: Big-O, Big-Theta, and Big-Omega\n- Recursive relations and divide-and-conquer algorithms",
+        "difficulty": "INTERMEDIATE",
+        "language": "English",
+        "estimatedHours": 4,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80",
+        "status": "PUBLISHED",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx1b0007ubs4yvt25cg1",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:23.153Z",
+        "updatedAt": "2026-09-16T08:58:23.153Z",
+        "publishedAt": "2026-09-16T08:58:23.151Z"
+      },
+      {
+        "id": "cmu3vbxao001rubs4osfwhjet",
+        "title": "Tech Startup Strategy & Product Management",
+        "slug": "tech-startup-product-management",
+        "shortSummary": "Validate ideas, build Minimum Viable Products (MVPs), and define product-market fit.",
+        "description": "# Tech Startup Strategy & Product Management\nLearn how top tech founders validate problem-solution fit, conduct unbiased customer discovery interviews, build low-fidelity prototypes, and define north-star growth metrics.\n\n### Key Takeaways:\n- Customer discovery frameworks (The Mom Test)\n- Creating prioritized feature roadmaps with RICE scoring\n- Setting up actionable product analytics and retention loops",
+        "difficulty": "BEGINNER",
+        "language": "English",
+        "estimatedHours": 3.5,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&auto=format&fit=crop&q=80",
+        "status": "PUBLISHED",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx100006ubs4cbeczkme",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:23.184Z",
+        "updatedAt": "2026-09-16T08:58:23.184Z",
+        "publishedAt": "2026-09-16T08:58:23.182Z"
+      },
+      {
+        "id": "cmu3vbxbe001xubs45syu7324",
+        "title": "Modern Web Development with Next.js 15 & React 19",
+        "slug": "modern-web-development-nextjs15",
+        "shortSummary": "Comprehensive masterclass on React Server Components, App Router, and server actions.",
+        "description": "Build full-stack, scalable web applications with the modern Next.js 15 App Router architecture. Includes deep dives into React Server Components, dynamic streaming, and server actions.",
+        "difficulty": "INTERMEDIATE",
+        "language": "English",
+        "estimatedHours": 6,
+        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80",
+        "status": "PENDING_REVIEW",
+        "authorId": "cmu3vbwzk0001ubs4is77nf8p",
+        "categoryId": "cmu3vbx030003ubs40p48rn0u",
+        "rejectionReason": null,
+        "createdAt": "2026-09-16T08:58:23.211Z",
+        "updatedAt": "2026-09-16T08:58:23.211Z",
+        "publishedAt": null
+      }
+    ],
+    "modules": [
+      {
+        "id": "cmu3vbx4d000jubs4m47s65pv",
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "title": "Module 1: Getting Started with Python",
+        "description": "Installation, execution environments, and writing your very first code.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:22.957Z",
+        "updatedAt": "2026-09-16T08:58:22.957Z"
+      },
+      {
+        "id": "cmu3vbx55000pubs4uitv16e6",
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "title": "Module 2: Logic & Control Flow",
+        "description": "Making decisions with if statements and repeating tasks with loops.",
+        "orderIndex": 2,
+        "createdAt": "2026-09-16T08:58:22.985Z",
+        "updatedAt": "2026-09-16T08:58:22.985Z"
+      },
+      {
+        "id": "cmu3vbx5x000vubs4ewuuizvx",
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "title": "Module 3: Functions & Reusable Code",
+        "description": "Packaging code into modular, reusable blocks with arguments and return values.",
+        "orderIndex": 3,
+        "createdAt": "2026-09-16T08:58:23.013Z",
+        "updatedAt": "2026-09-16T08:58:23.013Z"
+      },
+      {
+        "id": "cmu3vbx730011ubs4uklmxa4e",
+        "courseId": "cmu3vbx6i000zubs4zp1742jo",
+        "title": "Module 1: Principles of Interaction Design",
+        "description": "How humans perceive digital screens and interact with interfaces.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:23.055Z",
+        "updatedAt": "2026-09-16T08:58:23.055Z"
+      },
+      {
+        "id": "cmu3vbx7x0017ubs47rcwxmmc",
+        "courseId": "cmu3vbx7m0015ubs4kjxb9bel",
+        "title": "Module 1: Semantic HTML5 & Document Structure",
+        "description": "Building accessible and machine-readable page foundations.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:23.085Z",
+        "updatedAt": "2026-09-16T08:58:23.085Z"
+      },
+      {
+        "id": "cmu3vbx8f001bubs4flwfx8ir",
+        "courseId": "cmu3vbx7m0015ubs4kjxb9bel",
+        "title": "Module 2: Modern CSS Layouts & Flexbox",
+        "description": "Visual alignment, spacing, and fluid responsive design.",
+        "orderIndex": 2,
+        "createdAt": "2026-09-16T08:58:23.104Z",
+        "updatedAt": "2026-09-16T08:58:23.104Z"
+      },
+      {
+        "id": "cmu3vbx98001hubs4oogcxw79",
+        "courseId": "cmu3vbx8y001fubs4ik5tw8i6",
+        "title": "Module 1: Data Wrangling with Pandas",
+        "description": "Cleaning messy datasets and feature engineering.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:23.132Z",
+        "updatedAt": "2026-09-16T08:58:23.132Z"
+      },
+      {
+        "id": "cmu3vbxa5001nubs4k7sms97d",
+        "courseId": "cmu3vbx9t001lubs4lshksl3u",
+        "title": "Module 1: Logic & Asymptotic Complexity",
+        "description": "Mathematical rigor and analyzing algorithm runtime efficiency.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:23.165Z",
+        "updatedAt": "2026-09-16T08:58:23.165Z"
+      },
+      {
+        "id": "cmu3vbxax001tubs4yjea6bdu",
+        "courseId": "cmu3vbxao001rubs4osfwhjet",
+        "title": "Module 1: Finding Problem-Solution Fit",
+        "description": "Customer research and rapid prototyping principles.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:23.193Z",
+        "updatedAt": "2026-09-16T08:58:23.193Z"
+      },
+      {
+        "id": "cmu3vbxbm001zubs4uw0dk8fj",
+        "courseId": "cmu3vbxbe001xubs45syu7324",
+        "title": "Module 1: The React Server Component Paradigm",
+        "description": "Understand the split between server and client components.",
+        "orderIndex": 1,
+        "createdAt": "2026-09-16T08:58:23.218Z",
+        "updatedAt": "2026-09-16T08:58:23.218Z"
+      }
+    ],
+    "lessons": [
+      {
+        "id": "cmu3vbx4l000lubs4wtx23pwk",
+        "moduleId": "cmu3vbx4d000jubs4m47s65pv",
+        "title": "Introduction & What is Python?",
+        "slug": "introduction-what-is-python",
+        "description": "An overview of Python's design philosophy, history, and why it's chosen worldwide.",
+        "contentType": "TEXT",
+        "textContent": "## Welcome to Python!\n\nPython was created by **Guido van Rossum** in the late 1980s. Its core philosophy is summarized in the famous *Zen of Python*:\n\n> *\"Beautiful is better than ugly. Explicit is better than implicit. Simple is better than complex.\"*\n\n### Why Learn Python?\n1. **Readable Syntax:** Python looks remarkably like plain English.\n2. **Huge Ecosystem:** Millions of packages available for web development, data science, and AI.\n3. **Cross-Platform:** Runs seamlessly on Windows, macOS, and Linux.\n\n```python\n# Your very first Python script\nprint(\"Hello, Open Learner World!\")\n```\n\nTake a moment to read this code. Notice that there are no semicolons or complex boilerplates. You simply invoke `print()`!",
+        "mediaUrl": null,
+        "durationMinutes": 10,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:22.966Z",
+        "updatedAt": "2026-09-16T08:58:22.966Z"
+      },
+      {
+        "id": "cmu3vbx4v000nubs4yag4gfw3",
+        "moduleId": "cmu3vbx4d000jubs4m47s65pv",
+        "title": "Variables and Data Types",
+        "slug": "variables-and-data-types",
+        "description": "How computers store information in memory: numbers, strings, and booleans.",
+        "contentType": "TEXT",
+        "textContent": "## Understanding Variables\n\nIn programming, a **variable** is a named container that holds a value in memory.\n\n### The 4 Basic Primitive Types in Python:\n1. **Integers (`int`):** Whole numbers without decimals, e.g., `age = 24`\n2. **Floats (`float`):** Real numbers with decimals, e.g., `price = 19.99`\n3. **Strings (`str`):** Text surrounded by quotes, e.g., `name = \"Alex\"`\n4. **Booleans (`bool`):** True or False flags, e.g., `is_enrolled = True`\n\n```python\n# Examples\ncourse_name = \"Python Fundamentals\"\ntotal_students = 1500\ncourse_rating = 4.92\nis_active = True\n\nprint(f\"Course: {course_name} (Rating: {course_rating})\")\n```\n\n### Dynamic Typing\nPython automatically detects the data type based on the assigned value. You don't need to specify types manually!",
+        "mediaUrl": null,
+        "durationMinutes": 15,
+        "orderIndex": 2,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:22.976Z",
+        "updatedAt": "2026-09-16T08:58:22.976Z"
+      },
+      {
+        "id": "cmu3vbx5e000rubs4psx7dp3j",
+        "moduleId": "cmu3vbx55000pubs4uitv16e6",
+        "title": "Conditional Statements (if / elif / else)",
+        "slug": "conditional-statements",
+        "description": "Teach your program how to make decisions based on runtime conditions.",
+        "contentType": "TEXT",
+        "textContent": "## Making Decisions in Python\n\nPrograms are not static; they react to user inputs and variables. We use `if`, `elif`, and `else` keywords.\n\n```python\nscore = 85\n\nif score >= 90:\n    grade = \"A\"\nelif score >= 80:\n    grade = \"B\"\nelif score >= 70:\n    grade = \"C\"\nelse:\n    grade = \"Needs Improvement\"\n\nprint(f\"Your grade is: {grade}\")\n```\n\n### Indentation Matters!\nIn Python, indentation (typically 4 spaces) defines code blocks. Unlike languages that use curly braces `{}`, Python relies on visual indentation.",
+        "mediaUrl": null,
+        "durationMinutes": 15,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:22.994Z",
+        "updatedAt": "2026-09-16T08:58:22.994Z"
+      },
+      {
+        "id": "cmu3vbx5o000tubs41jp5c60k",
+        "moduleId": "cmu3vbx55000pubs4uitv16e6",
+        "title": "Loops: for and while",
+        "slug": "loops-for-and-while",
+        "description": "Iterate through lists, count through ranges, and execute code repeatedly.",
+        "contentType": "TEXT",
+        "textContent": "## Repeating Actions with Loops\n\nInstead of writing the same line 100 times, computers excel at automated repetition.\n\n### The `for` Loop:\nUsed when you know the sequence or collection you want to iterate through.\n\n```python\nfruits = [\"apple\", \"banana\", \"blueberry\", \"mango\"]\n\nfor fruit in fruits:\n    print(f\"I enjoy eating {fruit}!\")\n```\n\n### The `range()` Function:\n```python\n# Prints numbers 1 through 5\nfor i in range(1, 6):\n    print(f\"Step {i}\")\n```\n\n### The `while` Loop:\nRepeats as long as a boolean condition remains `True`. Be careful not to create infinite loops!",
+        "mediaUrl": null,
+        "durationMinutes": 20,
+        "orderIndex": 2,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.004Z",
+        "updatedAt": "2026-09-16T08:58:23.004Z"
+      },
+      {
+        "id": "cmu3vbx67000xubs4m0flag3i",
+        "moduleId": "cmu3vbx5x000vubs4ewuuizvx",
+        "title": "Defining and Calling Functions",
+        "slug": "defining-and-calling-functions",
+        "description": "The DRY (Don't Repeat Yourself) principle and writing custom functions.",
+        "contentType": "TEXT",
+        "textContent": "## Reusable Functions with `def`\n\nA function is a named block of code that performs a specific task and only runs when called.\n\n```python\ndef calculate_progress(completed_lessons, total_lessons):\n    \"\"\"Calculates the completion percentage for a course.\"\"\"\n    if total_lessons == 0:\n        return 0.0\n    return round((completed_lessons / total_lessons) * 100, 1)\n\n# Calling our function\nmy_progress = calculate_progress(4, 6)\nprint(f\"Progress: {my_progress}%\") # Outputs: Progress: 66.7%\n```\n\n### Key Parts of a Function:\n1. **Header:** `def function_name(parameters):`\n2. **Docstring:** Explanation of what the function does\n3. **Body:** Code block indented 4 spaces\n4. **Return:** Sends the resulting value back to the caller",
+        "mediaUrl": null,
+        "durationMinutes": 20,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.023Z",
+        "updatedAt": "2026-09-16T08:58:23.023Z"
+      },
+      {
+        "id": "cmu3vbx7c0013ubs4c16bc7sw",
+        "moduleId": "cmu3vbx730011ubs4uklmxa4e",
+        "title": "Visual Hierarchy & Layout Spacing",
+        "slug": "visual-hierarchy-and-layout-spacing",
+        "description": "Guiding the user's eye using size, contrast, proximity, and whitespace.",
+        "contentType": "TEXT",
+        "textContent": "## Visual Hierarchy: Guiding the Human Eye\n\nVisual hierarchy is the arrangement and presentation of elements in order of their importance.\n\n### The 4 Core Levers:\n1. **Size:** Larger elements command attention first (e.g., `<h1>` headlines vs body text).\n2. **Contrast:** High-contrast elements pop out from the background (e.g., a primary action button).\n3. **Proximity:** Elements placed close together are perceived as belonging to the same group.\n4. **Whitespace:** Giving elements breathing room enhances legibility and reduces cognitive overload.",
+        "mediaUrl": null,
+        "durationMinutes": 15,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.064Z",
+        "updatedAt": "2026-09-16T08:58:23.064Z"
+      },
+      {
+        "id": "cmu3vbx860019ubs4gq5atd0r",
+        "moduleId": "cmu3vbx7x0017ubs47rcwxmmc",
+        "title": "HTML5 Document Tree & Semantic Elements",
+        "slug": "html5-document-tree-semantic-elements",
+        "description": "Header, main, section, article, and footer semantics.",
+        "contentType": "TEXT",
+        "textContent": "## Semantic HTML5 Foundations\nSemantic elements clearly describe their meaning to both browser and developer.\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Semantic Page</title>\n</head>\n<body>\n  <header>\n    <nav>...</nav>\n  </header>\n  <main>\n    <article>\n      <h1>Open Learning</h1>\n      <p>Semantic markup enhances accessibility (a11y) and search visibility.</p>\n    </article>\n  </main>\n  <footer>\n    <p>&copy; 2026 OpenLearner</p>\n  </footer>\n</body>\n</html>\n```",
+        "mediaUrl": null,
+        "durationMinutes": 15,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.094Z",
+        "updatedAt": "2026-09-16T08:58:23.094Z"
+      },
+      {
+        "id": "cmu3vbx8o001dubs4swt5c8hc",
+        "moduleId": "cmu3vbx8f001bubs4flwfx8ir",
+        "title": "Mastering the CSS Box Model & Flexbox",
+        "slug": "mastering-css-box-model-flexbox",
+        "description": "Margin, padding, border, and flex containers.",
+        "contentType": "TEXT",
+        "textContent": "## CSS Flexbox in Practice\nFlexbox makes horizontal and vertical alignment predictable across device sizes.\n\n```css\n.card-container {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 1.5rem;\n}\n```",
+        "mediaUrl": null,
+        "durationMinutes": 20,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.112Z",
+        "updatedAt": "2026-09-16T08:58:23.112Z"
+      },
+      {
+        "id": "cmu3vbx9i001jubs4rhvq5lr7",
+        "moduleId": "cmu3vbx98001hubs4oogcxw79",
+        "title": "DataFrames, Indexing & Aggregations",
+        "slug": "dataframes-indexing-aggregations",
+        "description": "Filtering rows, grouping categories, and handling missing values.",
+        "contentType": "TEXT",
+        "textContent": "## Data Exploration with Pandas\n\n```python\nimport pandas as pd\n\n# Load dataset\ndf = pd.read_csv(\"student_scores.csv\")\n\n# Quick statistical overview\nprint(df.describe())\n\n# Grouping by course and calculating average completion\ncompletion_summary = df.groupby(\"course_name\")[\"progress_pct\"].mean()\nprint(completion_summary)\n```",
+        "mediaUrl": null,
+        "durationMinutes": 25,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.142Z",
+        "updatedAt": "2026-09-16T08:58:23.142Z"
+      },
+      {
+        "id": "cmu3vbxae001pubs4whifkg5r",
+        "moduleId": "cmu3vbxa5001nubs4k7sms97d",
+        "title": "Understanding Big-O Time & Space Complexity",
+        "slug": "understanding-big-o-complexity",
+        "description": "O(1), O(log n), O(n), O(n log n), and O(n^2) scaling characteristics.",
+        "contentType": "TEXT",
+        "textContent": "## Asymptotic Runtime Complexity\nBig-O notation characterizes how algorithm execution time grows as the input size $n$ approaches infinity.\n\n- **$O(1)$ Constant Time:** Hash map lookups\n- **$O(\\log n)$ Logarithmic Time:** Binary Search\n- **$O(n)$ Linear Time:** Single loop scan\n- **$O(n \\log n)$ Linearithmic Time:** MergeSort and QuickSort average case\n- **$O(n^2)$ Quadratic Time:** Nested loops (BubbleSort)",
+        "mediaUrl": null,
+        "durationMinutes": 20,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.175Z",
+        "updatedAt": "2026-09-16T08:58:23.175Z"
+      },
+      {
+        "id": "cmu3vbxb6001vubs45ow7bkya",
+        "moduleId": "cmu3vbxax001tubs4yjea6bdu",
+        "title": "Conducting Actionable User Discovery",
+        "slug": "conducting-actionable-user-discovery",
+        "description": "How to validate problems before writing a single line of code.",
+        "contentType": "TEXT",
+        "textContent": "## The Customer Discovery Framework\nGreat products solve acute, urgent, and pervasive problems.\n\n### Golden Rules of Discovery:\n1. Talk about their life and specific past behaviors, not your hypothetical idea.\n2. Ask for concrete examples of how they currently solve the problem.\n3. Listen 80% of the time, talk 20% of the time.",
+        "mediaUrl": null,
+        "durationMinutes": 15,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.202Z",
+        "updatedAt": "2026-09-16T08:58:23.202Z"
+      },
+      {
+        "id": "cmu3vbxbt0021ubs4v07mp0hn",
+        "moduleId": "cmu3vbxbm001zubs4uw0dk8fj",
+        "title": "Server Components vs Client Components",
+        "slug": "server-vs-client-components",
+        "description": "Zero-bundle-size server components and when to use 'use client'.",
+        "contentType": "TEXT",
+        "textContent": "## The Next.js 15 App Router Model\n\nReact Server Components (RSC) execute exclusively on the server, producing rendered HTML without sending runtime JavaScript to the client browser.",
+        "mediaUrl": null,
+        "durationMinutes": 25,
+        "orderIndex": 1,
+        "isRequired": true,
+        "createdAt": "2026-09-16T08:58:23.226Z",
+        "updatedAt": "2026-09-16T08:58:23.226Z"
+      }
+    ],
+    "resources": [],
+    "enrollments": [
+      {
+        "id": "cmu3vbxc00023ubs4xip2ygfe",
+        "userId": "cmu3vbwzt0002ubs4skry1mm6",
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "enrolledAt": "2026-09-16T08:58:23.232Z"
+      }
+    ],
+    "lessonProgress": [
+      {
+        "id": "cmu3vbxc80025ubs40cj7u9ww",
+        "userId": "cmu3vbwzt0002ubs4skry1mm6",
+        "lessonId": "cmu3vbx4l000lubs4wtx23pwk",
+        "isCompleted": true,
+        "completedAt": "2026-09-16T08:58:23.239Z",
+        "updatedAt": "2026-09-16T08:58:23.241Z"
+      },
+      {
+        "id": "cmu3vbxci0027ubs48mq7irtm",
+        "userId": "cmu3vbwzt0002ubs4skry1mm6",
+        "lessonId": "cmu3vbx5e000rubs4psx7dp3j",
+        "isCompleted": true,
+        "completedAt": "2026-09-16T08:58:23.248Z",
+        "updatedAt": "2026-09-16T08:58:23.250Z"
+      }
+    ],
+    "courseProgress": [
+      {
+        "id": "cmu3vbxcr0029ubs48c80qpl7",
+        "userId": "cmu3vbwzt0002ubs4skry1mm6",
+        "courseId": "cmu3vbx3t000hubs4q6xwmk9t",
+        "completedLessons": 2,
+        "totalLessons": 5,
+        "percentage": 40,
+        "isCompleted": false,
+        "lastLessonId": "cmu3vbx5e000rubs4psx7dp3j",
+        "completedAt": null,
+        "updatedAt": "2026-09-16T08:58:23.259Z"
+      }
+    ],
+    "courseReviews": []
+  }
+}

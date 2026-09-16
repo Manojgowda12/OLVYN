@@ -7,8 +7,8 @@ import { slugify } from "@/lib/utils";
 export async function POST(req: NextRequest) {
   const session = await getSession();
 
-  if (!session || (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN")) {
-    return NextResponse.json({ error: "Forbidden. Contributor access required." }, { status: 403 });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized. Please sign in to create courses." }, { status: 401 });
   }
 
   try {

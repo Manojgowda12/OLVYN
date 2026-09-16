@@ -10,7 +10,9 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "check:supabase": "tsx scripts/check-supabase.ts",
+    "verify": "tsx scripts/verify-platform.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -18,6 +20,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.4.1",
+    "@supabase/supabase-js": "^2.116.0",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "jose": "^5.9.6",

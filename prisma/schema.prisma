@@ -1,11 +1,16 @@
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
+
+// ==========================================
+// ENUMS
+// ==========================================
 
 enum Role {
   LEARNER
@@ -13,11 +18,24 @@ enum Role {
   ADMIN
 }
 
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
 enum CourseStatus {
   DRAFT
   PENDING_REVIEW
   PUBLISHED
   REJECTED
+  ARCHIVED
+}
+
+enum ContentOwnership {
+  OWNED
+  OPEN_LICENSE
+  EXTERNAL_CURATED
 }
 
 enum ContentType {
@@ -35,23 +53,69 @@ enum Difficulty {
   ALL_LEVELS
 }
 
-model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  passwordHash  String
-  name          String
-  role          String          @default("LEARNER") // Stored as string for SQLite compatibility: LEARNER, CONTRIBUTOR, ADMIN
-  bio           String?
-  avatarUrl     String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  courses       Course[]        @relation("AuthorCourses")
-  enrollments   Enrollment[]
-  lessonProgress LessonProgress[]
-  courseProgress CourseProgress[]
-  reviews       CourseReview[]  @relation("AdminReviews")
+enum ReviewAction {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  RESUBMITTED
 }
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum AIMode {
+  DISCOVERY
+  TUTORING
+  LEARNING_PATH
+}
+
+enum AIMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+// ==========================================
+// USER DOMAIN
+// ==========================================
+
+model User {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  normalizedEmail String        @unique
+  passwordHash    String
+  name            String
+  role            Role          @default(LEARNER)
+  status          AccountStatus @default(ACTIVE)
+  bio             String?
+  avatarUrl       String?
+  lastLoginAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  courses         Course[]         @relation("AuthorCourses")
+  enrollments     Enrollment[]
+  lessonProgress  LessonProgress[]
+  courseProgress  CourseProgress[]
+  savedCourses    SavedCourse[]
+  reviewsAuthored CourseReview[]   @relation("AdminReviews")
+  auditLogs       AuditLog[]       @relation("ActorAuditLogs")
+  contentReports  ContentReport[]  @relation("UserReports")
+  resolvedReports ContentReport[]  @relation("AdminResolvedReports")
+  aiConversations AIConversation[]
+  uploadedFiles   FileAsset[]
+
+  @@index([role, status])
+  @@index([createdAt])
+}
+
+// ==========================================
+// CATALOG & TAXONOMIES
+// ==========================================
 
 model Category {
   id          String   @id @default(cuid())
@@ -61,6 +125,8 @@ model Category {
   icon        String?
   createdAt   DateTime @default(now())
   courses     Course[]
+
+  @@index([slug])
 }
 
 model Tag {
@@ -68,6 +134,8 @@ model Tag {
   name    String      @unique
   slug    String      @unique
   courses CourseTag[]
+
+  @@index([slug])
 }
 
 model CourseTag {
@@ -79,35 +147,45 @@ model CourseTag {
   @@id([courseId, tagId])
 }
 
-model Course {
-  id              String          @id @default(cuid())
-  title           String
-  slug            String          @unique
-  shortSummary    String
-  description     String
-  difficulty      String          @default("BEGINNER") // BEGINNER, INTERMEDIATE, ADVANCED, ALL_LEVELS
-  language        String          @default("English")
-  estimatedHours  Float?
-  thumbnailUrl    String?
-  status          String          @default("DRAFT") // DRAFT, PENDING_REVIEW, PUBLISHED, REJECTED
-  authorId        String
-  categoryId      String?
-  rejectionReason String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  publishedAt     DateTime?
+// ==========================================
+// COURSE STRUCTURE
+// ==========================================
 
-  author          User            @relation("AuthorCourses", fields: [authorId], references: [id])
-  category        Category?       @relation(fields: [categoryId], references: [id])
+model Course {
+  id               String           @id @default(cuid())
+  title            String
+  slug             String           @unique
+  shortSummary     String
+  description      String
+  difficulty       Difficulty       @default(BEGINNER)
+  language         String           @default("English")
+  estimatedHours   Float?
+  thumbnailUrl     String?
+  status           CourseStatus     @default(DRAFT)
+  license          String           @default("CC-BY-4.0")
+  contentOwnership ContentOwnership @default(OPEN_LICENSE)
+  authorId         String
+  categoryId       String?
+  rejectionReason  String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  publishedAt      DateTime?
+
+  author          User             @relation("AuthorCourses", fields: [authorId], references: [id], onDelete: Restrict)
+  category        Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   tags            CourseTag[]
   modules         Module[]
   enrollments     Enrollment[]
   progress        CourseProgress[]
+  savedBy         SavedCourse[]
   reviews         CourseReview[]
+  contentReports  ContentReport[]
+  aiConversations AIConversation[]
 
-  @@index([status])
-  @@index([authorId])
-  @@index([categoryId])
+  @@index([status, publishedAt])
+  @@index([authorId, status])
+  @@index([categoryId, status])
+  @@index([difficulty])
 }
 
 model Module {
@@ -122,6 +200,7 @@ model Module {
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons     Lesson[]
 
+  @@unique([courseId, orderIndex])
   @@index([courseId, orderIndex])
 }
 
@@ -131,9 +210,9 @@ model Lesson {
   title           String
   slug            String
   description     String?
-  contentType     String           @default("TEXT") // TEXT, VIDEO_URL, EXTERNAL_LINK, DOCUMENT_URL, CODE_REPO
-  textContent     String?          // Markdown or detailed explanation
-  mediaUrl        String?          // Video or external URL
+  contentType     ContentType      @default(TEXT)
+  textContent     String?
+  mediaUrl        String?
   durationMinutes Int?
   orderIndex      Int
   isRequired      Boolean          @default(true)
@@ -143,33 +222,48 @@ model Lesson {
   module          Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   resources       Resource[]
   progress        LessonProgress[]
+  contentReports  ContentReport[]
+  aiConversations AIConversation[]
 
+  @@unique([moduleId, orderIndex])
+  @@unique([moduleId, slug])
   @@index([moduleId, orderIndex])
 }
 
 model Resource {
-  id           String   @id @default(cuid())
-  lessonId     String
-  title        String
-  resourceType String   @default("EXTERNAL_LINK")
-  url          String
-  description  String?
-  createdAt    DateTime @default(now())
+  id             String          @id @default(cuid())
+  lessonId       String
+  title          String
+  resourceType   String          @default("EXTERNAL_LINK")
+  url            String
+  description    String?
+  isInternal     Boolean         @default(false)
+  createdAt      DateTime        @default(now())
 
-  lesson       Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson         Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  contentReports ContentReport[]
+
+  @@index([lessonId])
 }
 
-model Enrollment {
-  id         String   @id @default(cuid())
-  userId     String
-  courseId   String
-  enrolledAt DateTime @default(now())
+// ==========================================
+// LEARNING DOMAIN
+// ==========================================
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+model Enrollment {
+  id             String    @id @default(cuid())
+  userId         String
+  courseId       String
+  enrolledAt     DateTime  @default(now())
+  lastAccessedAt DateTime  @default(now())
+  completedAt    DateTime?
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course         Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
-  @@index([userId])
+  @@index([userId, enrolledAt])
+  @@index([courseId])
 }
 
 model LessonProgress {
@@ -184,7 +278,8 @@ model LessonProgress {
   lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
-  @@index([userId])
+  @@index([userId, isCompleted])
+  @@index([lessonId])
 }
 
 model CourseProgress {
@@ -203,17 +298,136 @@ model CourseProgress {
   course           Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
-  @@index([userId, courseId])
+  @@index([userId, isCompleted])
+  @@index([courseId])
 }
 
+model SavedCourse {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId, createdAt])
+}
+
+// ==========================================
+// GOVERNANCE & MODERATION
+// ==========================================
+
 model CourseReview {
-  id         String   @id @default(cuid())
+  id         String       @id @default(cuid())
   courseId   String
   reviewerId String
-  action     String   // PUBLISHED or REJECTED
+  action     ReviewAction @default(SUBMITTED)
   comments   String?
+  createdAt  DateTime     @default(now())
+
+  course     Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  reviewer   User         @relation("AdminReviews", fields: [reviewerId], references: [id], onDelete: Restrict)
+
+  @@index([courseId, createdAt])
+  @@index([reviewerId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
   createdAt  DateTime @default(now())
 
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  reviewer   User     @relation("AdminReviews", fields: [reviewerId], references: [id])
+  actor      User?    @relation("ActorAuditLogs", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+model ContentReport {
+  id              String       @id @default(cuid())
+  reporterId      String
+  courseId        String?
+  lessonId        String?
+  resourceId      String?
+  reason          String
+  description     String?
+  status          ReportStatus @default(OPEN)
+  reviewedById    String?
+  reviewedAt      DateTime?
+  resolutionNotes String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  reporter        User         @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  reviewer        User?        @relation("AdminResolvedReports", fields: [reviewedById], references: [id], onDelete: SetNull)
+  course          Course?      @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lesson          Lesson?      @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  resource        Resource?    @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([reporterId])
+}
+
+// ==========================================
+// AI & NOVA DOMAIN
+// ==========================================
+
+model AIConversation {
+  id        String      @id @default(cuid())
+  userId    String?
+  courseId  String?
+  lessonId  String?
+  mode      AIMode      @default(DISCOVERY)
+  title     String      @default("Learning Session")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course?     @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lesson    Lesson?     @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  messages  AIMessage[]
+
+  @@index([userId, createdAt])
+  @@index([courseId])
+}
+
+model AIMessage {
+  id             String        @id @default(cuid())
+  conversationId String
+  role           AIMessageRole @default(USER)
+  content        String
+  createdAt      DateTime      @default(now())
+
+  conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+// ==========================================
+// MEDIA & FILE STORAGE
+// ==========================================
+
+model FileAsset {
+  id              String   @id @default(cuid())
+  uploaderId      String?
+  storageProvider String   @default("supabase")
+  bucket          String   @default("course-assets")
+  objectPath      String   @unique
+  fileName        String
+  mimeType        String
+  sizeBytes       Int
+  isPublic        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  uploader        User?    @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([uploaderId])
+  @@index([bucket])
 }

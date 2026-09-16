@@ -86,3 +86,39 @@ export async function getCurrentUser() {
     },
   });
 }
+
+export async function ensurePermanentAdmin() {
+  const adminEmail = (process.env.ADMIN_EMAIL || "admin@openlearner.ai").toLowerCase();
+  const adminRawPassword = process.env.ADMIN_PASSWORD || "AdminSecure2026!";
+
+  try {
+    const existing = await db.user.findUnique({
+      where: { email: adminEmail },
+    });
+
+    if (!existing) {
+      const passwordHash = await hashPassword(adminRawPassword);
+      return await db.user.create({
+        data: {
+          email: adminEmail,
+          normalizedEmail: adminEmail.toLowerCase(),
+          passwordHash,
+          name: "Platform Administrator",
+          role: "ADMIN",
+          bio: "Chief editorial lead and platform moderator.",
+        },
+      });
+    } else if (existing.role !== "ADMIN") {
+      return await db.user.update({
+        where: { id: existing.id },
+        data: { role: "ADMIN" },
+      });
+    }
+    return existing;
+  } catch (err) {
+    console.error("Error ensuring permanent admin:", err);
+    return null;
+  }
+}
+
+

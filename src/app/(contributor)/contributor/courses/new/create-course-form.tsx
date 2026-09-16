@@ -58,17 +58,17 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
   };
 
   return (
-    <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl">
+    <div className="p-7 sm:p-9 rounded-3xl bg-white border border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] text-[#121417]">
       {error && (
-        <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+        <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" suppressHydrationWarning>
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
             Course Title *
           </label>
           <input
@@ -77,12 +77,13 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Introduction to Cloud Architecture"
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+            suppressHydrationWarning
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
             Short Summary * (10-200 chars)
           </label>
           <input
@@ -91,19 +92,21 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
             value={shortSummary}
             onChange={(e) => setShortSummary(e.target.value)}
             placeholder="A concise, punchy description shown in cards and search results."
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+            suppressHydrationWarning
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
               Category *
             </label>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] transition-all"
+              suppressHydrationWarning
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -114,13 +117,14 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
               Difficulty *
             </label>
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] transition-all"
+              suppressHydrationWarning
             >
               <option value="BEGINNER">Beginner</option>
               <option value="INTERMEDIATE">Intermediate</option>
@@ -132,7 +136,7 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
               Estimated Duration (Hours)
             </label>
             <input
@@ -141,12 +145,13 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
               min="0.5"
               value={estimatedHours}
               onChange={(e) => setEstimatedHours(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] transition-all"
+              suppressHydrationWarning
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
               Thumbnail Image URL (Optional)
             </label>
             <input
@@ -154,13 +159,14 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
               value={thumbnailUrl}
               onChange={(e) => setThumbnailUrl(e.target.value)}
               placeholder="https://images.unsplash.com/..."
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] transition-all"
+              suppressHydrationWarning
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
             Full Course Description *
           </label>
           <textarea
@@ -169,14 +175,15 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Explain what learners will achieve, prerequisites, and learning outcomes."
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 transition-colors font-mono"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] transition-all font-mono"
+            suppressHydrationWarning
           />
         </div>
 
-        <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+        <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
           <Link
             href="/contributor"
-            className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5"
+            className="text-xs font-bold text-[#121417] hover:underline flex items-center gap-1.5"
           >
             <ArrowLeft className="w-4 h-4" /> Cancel
           </Link>
@@ -184,9 +191,10 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-sm shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2"
+            className="px-7 py-3 rounded-full bg-[#121417] hover:bg-black disabled:opacity-50 text-[#d2f835] font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-[0.98]"
+            suppressHydrationWarning
           >
-            {isLoading ? "Creating Draft..." : "Continue to Course Studio"}
+            <span>{isLoading ? "Creating Draft..." : "Continue to Course Studio"}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -194,3 +202,4 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
     </div>
   );
 }
+

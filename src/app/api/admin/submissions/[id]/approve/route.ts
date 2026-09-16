@@ -39,7 +39,7 @@ export async function POST(
       data: {
         courseId,
         reviewerId: session.userId,
-        action: "PUBLISHED",
+        action: "APPROVED",
         comments: "Course approved and published to public catalog.",
       },
     }),

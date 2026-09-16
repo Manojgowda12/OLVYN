@@ -1,46 +1,71 @@
 import Link from "next/link";
-import { BookOpen, Github, Heart } from "lucide-react";
+import { Globe, Heart } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/60 text-slate-400 text-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center gap-2 font-bold text-lg text-white">
-              <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                <BookOpen className="w-4 h-4" />
-              </div>
-              <span>OpenLearner AI</span>
-            </div>
-            <p className="text-slate-400 text-sm max-w-sm">
-              An open, transparent learning platform empowering anyone to discover, learn, and contribute legally shareable educational courses with AI-powered tutoring.
+    <footer className="bg-[#121417] text-slate-400 mt-auto border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 pt-16 pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+          {/* Brand Col */}
+          <div className="space-y-4">
+            <span className="font-black text-xl text-white tracking-tight flex items-center">
+              OpenLearner<span className="text-[#d2f835] ml-0.5">.ai</span>
+            </span>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
+              Learn everything you want and need. Free open courses with transparent syllabi, progress tracking, and Nova AI tutor.
             </p>
           </div>
 
+          {/* Column 1: Links */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200 mb-3">Platform</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/explore" className="hover:text-white transition-colors">Explore Catalog</Link></li>
-              <li><Link href="/#nova" className="hover:text-white transition-colors">Nova AI Assistant</Link></li>
-              <li><Link href="/register" className="hover:text-white transition-colors">Join Community</Link></li>
+            <h4 className="text-xs font-black uppercase tracking-wider text-[#d2f835] mb-4">Navigation</h4>
+            <ul className="space-y-2.5 text-xs text-slate-300 font-semibold">
+              <li><Link href="/" className="hover:text-[#d2f835] transition-colors">Home</Link></li>
+              <li><Link href="/explore" className="hover:text-[#d2f835] transition-colors">Course Catalog</Link></li>
+              <li><Link href="/#categories" className="hover:text-[#d2f835] transition-colors">Categories</Link></li>
+              <li><Link href="/#nova" className="hover:text-[#d2f835] transition-colors">Nova AI Assistant</Link></li>
             </ul>
           </div>
 
+          {/* Column 2: Studio */}
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200 mb-3">Roles & Guidelines</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/login" className="hover:text-white transition-colors">Learner Portal</Link></li>
-              <li><Link href="/login" className="hover:text-white transition-colors">Course Creator Studio</Link></li>
-              <li><Link href="/login" className="hover:text-white transition-colors">Editorial Standards</Link></li>
+            <h4 className="text-xs font-black uppercase tracking-wider text-[#d2f835] mb-4">Studio & Authors</h4>
+            <ul className="space-y-2.5 text-xs text-slate-300 font-semibold">
+              <li><Link href="/contributor" className="hover:text-[#d2f835] transition-colors">Creator Studio</Link></li>
+              <li><Link href="/contributor/courses/new" className="hover:text-[#d2f835] transition-colors">Create Course Draft</Link></li>
+              <li><Link href="/admin" className="hover:text-[#d2f835] transition-colors">Editorial Review</Link></li>
+              <li><Link href="/register" className="hover:text-[#d2f835] transition-colors">Join Community</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 3: Contact info */}
+          <div>
+            <h4 className="text-xs font-black uppercase tracking-wider text-[#d2f835] mb-4">Platform</h4>
+            <ul className="space-y-2 text-xs text-slate-300">
+              <li className="font-semibold text-white">support@openlearner.ai</li>
+              <li>Global Open Learning Network</li>
+              <li className="pt-2 text-slate-400">100% Free Open Education Initiative</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} OpenLearner AI Platform. Open educational resources.</p>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">Built with rigor and modular architecture</span>
+        {/* Bottom Bar */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span>© {new Date().getFullYear()} OpenLearner AI. All Rights Reserved.</span>
+            <span>·</span>
+            <Link href="/explore" className="hover:text-white transition-colors">Privacy</Link>
+            <span>·</span>
+            <Link href="/explore" className="hover:text-white transition-colors">Terms of Use</Link>
+          </div>
+
+          <div className="flex items-center gap-4 text-slate-400 font-semibold">
+            <span className="flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5" />
+              <span>EN (US)</span>
+            </span>
+            <span>·</span>
+            <span className="text-[#d2f835] font-black">100% Free Access</span>
           </div>
         </div>
       </div>

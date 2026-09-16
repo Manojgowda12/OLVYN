@@ -1,102 +1,84 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
-import { BookOpen, Sparkles, User, LogOut, LayoutDashboard, ShieldAlert, PenTool } from "lucide-react";
+import { BookOpen, Sparkles, PenTool, Globe, Menu, User, ShieldAlert, LogOut, LayoutDashboard } from "lucide-react";
 
 export async function Navbar() {
   const session = await getSession();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand */}
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5 font-bold text-xl tracking-tight text-white group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <span>
-              Open<span className="text-blue-400">Learner</span>
-              <span className="text-xs ml-1 px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono border border-blue-500/20">AI</span>
+    <header className="sticky top-0 z-50 w-full bg-[#f6f8f5]/90 backdrop-blur-md border-b border-black/5">
+      <div className="max-w-7xl mx-auto h-20 px-6 lg:px-12 flex items-center justify-between">
+        {/* Brand Wordmark with vibrant badge dot */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-[#121417] flex items-center justify-center text-[#d2f835] shadow-xs group-hover:rotate-6 transition-transform">
+            <BookOpen className="w-5 h-5 text-[#d2f835]" />
+          </div>
+          <span className="font-extrabold text-[22px] tracking-tight text-[#121417]">
+            OpenLearner<span className="text-[#d2f835] bg-[#121417] px-1 rounded-sm ml-0.5 text-sm font-black">AI</span>
+          </span>
+        </Link>
+
+        {/* Center Links */}
+        <nav className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-[#121417]">
+          <Link href="/" className="hover:text-black transition-colors">
+            Home
+          </Link>
+          <Link href="/explore" className="hover:text-black transition-colors">
+            Courses
+          </Link>
+          <Link href="/#categories" className="hover:text-black transition-colors">
+            Categories
+          </Link>
+          <Link href="/nova" className="flex items-center gap-1.5 hover:text-black transition-colors">
+            <Sparkles className="w-3.5 h-3.5 text-[#121417]" />
+            <span>Nova AI</span>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-[#d2f835] text-[#121417] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#121417] animate-pulse"></span>
+              Live
             </span>
           </Link>
+          <Link href="/contributor" className="hover:text-black transition-colors">
+            Studio
+          </Link>
+        </nav>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link
-              href="/explore"
-              className="text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"
-            >
-              Explore Courses
-            </Link>
-            <Link
-              href="/#nova"
-              className="text-slate-300 hover:text-white transition-colors flex items-center gap-1.5"
-            >
-              <Sparkles className="w-4 h-4 text-violet-400" />
-              Nova AI
-            </Link>
-          </nav>
-        </div>
-
-        {/* User / Auth Controls */}
+        {/* Right Action Pill */}
         <div className="flex items-center gap-3">
           {session ? (
-            <div className="flex items-center gap-3">
-              {session.role === "ADMIN" && (
-                <Link
-                  href="/admin"
-                  className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
-                >
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                  Admin Console
-                </Link>
-              )}
-
-              {(session.role === "CONTRIBUTOR" || session.role === "ADMIN") && (
-                <Link
-                  href="/contributor"
-                  className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors"
-                >
-                  <PenTool className="w-3.5 h-3.5" />
-                  Creator Studio
-                </Link>
-              )}
-
+            <div className="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded-full bg-white border border-slate-200 shadow-xs">
               <Link
-                href="/dashboard"
-                className="flex items-center gap-1.5 text-sm font-medium px-3.5 py-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white transition-colors border border-slate-700/60"
+                href={session.role === "ADMIN" ? "/admin" : session.role === "CONTRIBUTOR" ? "/contributor" : "/dashboard"}
+                className="flex items-center gap-2 group"
               >
-                <LayoutDashboard className="w-4 h-4 text-blue-400" />
-                <span className="hidden sm:inline">My Dashboard</span>
-              </Link>
-
-              <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
-                <div className="hidden md:block text-right">
-                  <p className="text-xs font-medium text-slate-200 leading-tight">{session.name}</p>
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wider">{session.role}</p>
+                <div className="w-8 h-8 rounded-full bg-[#121417] text-[#d2f835] flex items-center justify-center text-xs font-black uppercase shadow-xs">
+                  {session.name.charAt(0)}
                 </div>
-
-                <form action="/api/auth/logout" method="POST">
-                  <button
-                    type="submit"
-                    title="Sign Out"
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </form>
-              </div>
+                <span className="text-xs font-bold text-[#121417] max-w-[90px] truncate hidden sm:inline-block">
+                  {session.name.split(" ")[0]}
+                </span>
+              </Link>
+              <form action="/api/auth/logout" method="POST" className="inline" suppressHydrationWarning>
+                <button
+                  type="submit"
+                  title="Sign Out"
+                  className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-red-500 transition-colors"
+                  suppressHydrationWarning
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </form>
             </div>
           ) : (
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 rounded-lg transition-colors"
+                className="text-[14px] font-bold text-[#121417] hover:underline px-2 py-1"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="text-sm font-semibold px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30"
+                className="text-[14px] font-bold bg-white hover:bg-slate-50 text-[#121417] px-6 py-2.5 rounded-full border border-black/10 shadow-xs hover:shadow-sm transition-all"
               >
                 Get Started
               </Link>

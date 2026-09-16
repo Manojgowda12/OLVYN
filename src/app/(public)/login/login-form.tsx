@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, Lock, Mail, ArrowRight, AlertCircle } from "lucide-react";
+import { BookOpen, Lock, Mail, ArrowRight, AlertCircle, Sparkles, ShieldCheck } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -30,13 +30,13 @@ export function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to log in.");
+        throw new Error(data.error || "Invalid email or password.");
       }
 
       // Check role to redirect appropriately if default
-      if (data.user?.role === "ADMIN" && redirect === "/dashboard") {
+      if (data.user?.role === "ADMIN" && (redirect === "/dashboard" || redirect === "/explore")) {
         router.push("/admin");
-      } else if (data.user?.role === "CONTRIBUTOR" && redirect === "/dashboard") {
+      } else if (data.user?.role === "CONTRIBUTOR" && (redirect === "/dashboard" || redirect === "/explore")) {
         router.push("/contributor");
       } else {
         router.push(redirect);
@@ -56,61 +56,63 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-[#f6f8f5]">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/25 mb-4">
-            <BookOpen className="w-6 h-6" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Welcome back</h1>
-          <p className="text-sm text-slate-400 mt-2">
-            Sign in to continue your learning journey
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#121417] text-[#d2f835] shadow-md mb-4 hover:scale-105 transition-transform">
+            <BookOpen className="w-6 h-6 text-[#d2f835]" />
+          </Link>
+          <h1 className="text-3xl font-black tracking-tight text-[#121417]">Welcome back</h1>
+          <p className="text-sm font-medium text-[#475467] mt-1.5">
+            Sign in to continue learning, teaching, and managing courses
           </p>
         </div>
 
         {/* Card */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl backdrop-blur-md">
+        <div className="p-7 sm:p-9 rounded-3xl bg-white border border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
           {error && (
-            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" suppressHydrationWarning>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  placeholder="name@openlearner.ai"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+                  suppressHydrationWarning
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#121417]">
                   Password
                 </label>
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  placeholder="••••••••••••"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -118,48 +120,53 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-semibold text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+              className="w-full mt-2 py-3.5 px-4 rounded-full bg-[#121417] hover:bg-black disabled:opacity-60 text-[#d2f835] font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+              suppressHydrationWarning
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              <span>{isLoading ? "Signing in..." : "Sign In to OpenLearner"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          {/* Quick autofill for developer testing */}
-          <div className="mt-6 pt-5 border-t border-slate-800/80">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
-              Quick Test Accounts (Click to Fill):
-            </p>
+          {/* Quick autofill for developer & admin testing */}
+          <div className="mt-7 pt-5 border-t border-slate-100">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3">
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
+              <span>Quick Test Accounts (Click to Fill):</span>
+            </div>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => quickFill("learner@openlearner.ai", "Learner123!")}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs text-blue-400 font-medium transition-colors"
+                onClick={() => quickFill("admin@openlearner.ai", "AdminSecure2026!")}
+                className="px-2.5 py-2 rounded-xl bg-[#121417] hover:bg-black text-[#d2f835] text-center text-xs font-black transition-all shadow-xs"
+                suppressHydrationWarning
               >
-                Learner
+                Admin
               </button>
               <button
                 type="button"
                 onClick={() => quickFill("contributor@openlearner.ai", "Contributor123!")}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs text-indigo-400 font-medium transition-colors"
+                className="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#121417] text-center text-xs font-bold transition-all border border-slate-200"
+                suppressHydrationWarning
               >
                 Contributor
               </button>
               <button
                 type="button"
-                onClick={() => quickFill("admin@openlearner.ai", "Admin123!")}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-xs text-amber-400 font-medium transition-colors"
+                onClick={() => quickFill("learner@openlearner.ai", "Learner123!")}
+                className="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#121417] text-center text-xs font-bold transition-all border border-slate-200"
+                suppressHydrationWarning
               >
-                Admin
+                Learner
               </button>
             </div>
           </div>
         </div>
 
         {/* Footer Link */}
-        <p className="text-center text-sm text-slate-400 mt-6">
+        <p className="text-center text-sm font-medium text-slate-500 mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium">
+          <Link href="/register" className="text-[#121417] hover:underline font-bold">
             Sign up for free
           </Link>
         </p>
@@ -167,3 +174,4 @@ export function LoginForm() {
     </div>
   );
 }
+

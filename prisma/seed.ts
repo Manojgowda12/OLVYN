@@ -22,15 +22,19 @@ async function main() {
 
   console.log("🧹 Cleaned existing database records.");
 
-  // 2. Hash passwords
-  const adminPasswordHash = await bcrypt.hash("Admin123!", 10);
+  // 2. Hash passwords with configured Permanent Admin credentials
+  const adminEmail = (process.env.ADMIN_EMAIL || "admin@openlearner.ai").toLowerCase();
+  const adminRawPassword = process.env.ADMIN_PASSWORD || "AdminSecure2026!";
+
+  const adminPasswordHash = await bcrypt.hash(adminRawPassword, 10);
   const contributorPasswordHash = await bcrypt.hash("Contributor123!", 10);
   const learnerPasswordHash = await bcrypt.hash("Learner123!", 10);
 
   // 3. Create Users
   const adminUser = await prisma.user.create({
     data: {
-      email: "admin@openlearner.ai",
+      email: adminEmail,
+      normalizedEmail: adminEmail.toLowerCase(),
       passwordHash: adminPasswordHash,
       name: "Platform Administrator",
       role: "ADMIN",
@@ -42,6 +46,7 @@ async function main() {
   const contributorUser = await prisma.user.create({
     data: {
       email: "contributor@openlearner.ai",
+      normalizedEmail: "contributor@openlearner.ai",
       passwordHash: contributorPasswordHash,
       name: "Sarah Jenkins",
       role: "CONTRIBUTOR",
@@ -53,6 +58,7 @@ async function main() {
   const learnerUser = await prisma.user.create({
     data: {
       email: "learner@openlearner.ai",
+      normalizedEmail: "learner@openlearner.ai",
       passwordHash: learnerPasswordHash,
       name: "Alex Chen",
       role: "LEARNER",
@@ -412,7 +418,283 @@ Visual hierarchy is the arrangement and presentation of elements in order of the
     },
   });
 
-  // 8. Create Seed Course 3: PENDING REVIEW Course (For Admin Review Testing!)
+  // 8. Create Seed Course 3: Web Development Essentials (HTML, CSS & JS) (PUBLISHED)
+  const webDevCourse = await prisma.course.create({
+    data: {
+      title: "Web Development Essentials: HTML, CSS & JavaScript",
+      slug: "web-development-essentials",
+      shortSummary: "Master semantic HTML5, modern CSS flexbox layouts, and core JavaScript DOM manipulation.",
+      description: `# Web Development Essentials
+Master the fundamental trio of web technologies that power modern internet experiences: HTML5 for document structure, CSS3 for responsive styling and flexbox grids, and modern JavaScript (ES6+) for interactive DOM manipulation and asynchronous data fetching.
+
+### Learning Objectives:
+- Structure accessible web documents with semantic HTML5 tags
+- Create responsive layouts using Flexbox, CSS Grid, and media queries
+- Manipulate the browser Document Object Model (DOM) dynamically with JavaScript
+- Fetch remote JSON data via REST APIs using async/await`,
+      difficulty: "BEGINNER",
+      language: "English",
+      estimatedHours: 5.0,
+      thumbnailUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&auto=format&fit=crop&q=80",
+      status: "PUBLISHED",
+      authorId: contributorUser.id,
+      categoryId: categories["programming-technology"].id,
+      publishedAt: new Date(),
+    },
+  });
+
+  const webMod1 = await prisma.module.create({
+    data: {
+      courseId: webDevCourse.id,
+      title: "Module 1: Semantic HTML5 & Document Structure",
+      description: "Building accessible and machine-readable page foundations.",
+      orderIndex: 1,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      moduleId: webMod1.id,
+      title: "HTML5 Document Tree & Semantic Elements",
+      slug: "html5-document-tree-semantic-elements",
+      description: "Header, main, section, article, and footer semantics.",
+      contentType: "TEXT",
+      orderIndex: 1,
+      isRequired: true,
+      durationMinutes: 15,
+      textContent: `## Semantic HTML5 Foundations
+Semantic elements clearly describe their meaning to both browser and developer.
+
+\`\`\`html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Semantic Page</title>
+</head>
+<body>
+  <header>
+    <nav>...</nav>
+  </header>
+  <main>
+    <article>
+      <h1>Open Learning</h1>
+      <p>Semantic markup enhances accessibility (a11y) and search visibility.</p>
+    </article>
+  </main>
+  <footer>
+    <p>&copy; 2026 OpenLearner</p>
+  </footer>
+</body>
+</html>
+\`\`\``,
+    },
+  });
+
+  const webMod2 = await prisma.module.create({
+    data: {
+      courseId: webDevCourse.id,
+      title: "Module 2: Modern CSS Layouts & Flexbox",
+      description: "Visual alignment, spacing, and fluid responsive design.",
+      orderIndex: 2,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      moduleId: webMod2.id,
+      title: "Mastering the CSS Box Model & Flexbox",
+      slug: "mastering-css-box-model-flexbox",
+      description: "Margin, padding, border, and flex containers.",
+      contentType: "TEXT",
+      orderIndex: 1,
+      isRequired: true,
+      durationMinutes: 20,
+      textContent: `## CSS Flexbox in Practice
+Flexbox makes horizontal and vertical alignment predictable across device sizes.
+
+\`\`\`css
+.card-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+\`\`\``,
+    },
+  });
+
+  // 9. Create Seed Course 4: Applied Data Science & ML with Python (PUBLISHED)
+  const dataScienceCourse = await prisma.course.create({
+    data: {
+      title: "Applied Data Science & Machine Learning with Python",
+      slug: "applied-data-science-machine-learning",
+      shortSummary: "Wrangle real-world data with Pandas & NumPy, plot trends, and train scikit-learn models.",
+      description: `# Applied Data Science & Machine Learning
+Turn raw data into actionable insights and predictive models. Learn data cleansing, exploratory data analysis (EDA), statistical visualization, and core supervised learning algorithms.
+
+### Curriculum Overview:
+- Vectorized computing and matrix algebra with NumPy
+- Dataframe wrangling, filtering, and aggregation with Pandas
+- Visualizing distributions with Matplotlib & Seaborn
+- Building classification and regression models with Scikit-Learn`,
+      difficulty: "INTERMEDIATE",
+      language: "English",
+      estimatedHours: 6.5,
+      thumbnailUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80",
+      status: "PUBLISHED",
+      authorId: contributorUser.id,
+      categoryId: categories["data-science-ai"].id,
+      publishedAt: new Date(),
+    },
+  });
+
+  const dsMod1 = await prisma.module.create({
+    data: {
+      courseId: dataScienceCourse.id,
+      title: "Module 1: Data Wrangling with Pandas",
+      description: "Cleaning messy datasets and feature engineering.",
+      orderIndex: 1,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      moduleId: dsMod1.id,
+      title: "DataFrames, Indexing & Aggregations",
+      slug: "dataframes-indexing-aggregations",
+      description: "Filtering rows, grouping categories, and handling missing values.",
+      contentType: "TEXT",
+      orderIndex: 1,
+      isRequired: true,
+      durationMinutes: 25,
+      textContent: `## Data Exploration with Pandas
+
+\`\`\`python
+import pandas as pd
+
+# Load dataset
+df = pd.read_csv("student_scores.csv")
+
+# Quick statistical overview
+print(df.describe())
+
+# Grouping by course and calculating average completion
+completion_summary = df.groupby("course_name")["progress_pct"].mean()
+print(completion_summary)
+\`\`\``,
+    },
+  });
+
+  // 10. Create Seed Course 5: Discrete Mathematics & Algorithm Design (PUBLISHED)
+  const mathCourse = await prisma.course.create({
+    data: {
+      title: "Discrete Mathematics & Algorithm Design",
+      slug: "discrete-mathematics-algorithms",
+      shortSummary: "Logic, set theory, combinatorics, and asymptotic complexity analysis for computer scientists.",
+      description: `# Discrete Mathematics & Algorithm Design
+The mathematical foundation behind computer algorithms, data structures, and cryptography.
+
+### Topics Covered:
+- Propositional and predicate logic, truth tables, and boolean algebra
+- Sets, relations, functions, and graph theory basics
+- Asymptotic analysis: Big-O, Big-Theta, and Big-Omega
+- Recursive relations and divide-and-conquer algorithms`,
+      difficulty: "INTERMEDIATE",
+      language: "English",
+      estimatedHours: 4.0,
+      thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80",
+      status: "PUBLISHED",
+      authorId: contributorUser.id,
+      categoryId: categories["mathematics-science"].id,
+      publishedAt: new Date(),
+    },
+  });
+
+  const mathMod1 = await prisma.module.create({
+    data: {
+      courseId: mathCourse.id,
+      title: "Module 1: Logic & Asymptotic Complexity",
+      description: "Mathematical rigor and analyzing algorithm runtime efficiency.",
+      orderIndex: 1,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      moduleId: mathMod1.id,
+      title: "Understanding Big-O Time & Space Complexity",
+      slug: "understanding-big-o-complexity",
+      description: "O(1), O(log n), O(n), O(n log n), and O(n^2) scaling characteristics.",
+      contentType: "TEXT",
+      orderIndex: 1,
+      isRequired: true,
+      durationMinutes: 20,
+      textContent: `## Asymptotic Runtime Complexity
+Big-O notation characterizes how algorithm execution time grows as the input size $n$ approaches infinity.
+
+- **$O(1)$ Constant Time:** Hash map lookups
+- **$O(\\log n)$ Logarithmic Time:** Binary Search
+- **$O(n)$ Linear Time:** Single loop scan
+- **$O(n \\log n)$ Linearithmic Time:** MergeSort and QuickSort average case
+- **$O(n^2)$ Quadratic Time:** Nested loops (BubbleSort)`,
+    },
+  });
+
+  // 11. Create Seed Course 6: Tech Startup Strategy & Product Management (PUBLISHED)
+  const businessCourse = await prisma.course.create({
+    data: {
+      title: "Tech Startup Strategy & Product Management",
+      slug: "tech-startup-product-management",
+      shortSummary: "Validate ideas, build Minimum Viable Products (MVPs), and define product-market fit.",
+      description: `# Tech Startup Strategy & Product Management
+Learn how top tech founders validate problem-solution fit, conduct unbiased customer discovery interviews, build low-fidelity prototypes, and define north-star growth metrics.
+
+### Key Takeaways:
+- Customer discovery frameworks (The Mom Test)
+- Creating prioritized feature roadmaps with RICE scoring
+- Setting up actionable product analytics and retention loops`,
+      difficulty: "BEGINNER",
+      language: "English",
+      estimatedHours: 3.5,
+      thumbnailUrl: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&auto=format&fit=crop&q=80",
+      status: "PUBLISHED",
+      authorId: contributorUser.id,
+      categoryId: categories["business-finance"].id,
+      publishedAt: new Date(),
+    },
+  });
+
+  const bizMod1 = await prisma.module.create({
+    data: {
+      courseId: businessCourse.id,
+      title: "Module 1: Finding Problem-Solution Fit",
+      description: "Customer research and rapid prototyping principles.",
+      orderIndex: 1,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      moduleId: bizMod1.id,
+      title: "Conducting Actionable User Discovery",
+      slug: "conducting-actionable-user-discovery",
+      description: "How to validate problems before writing a single line of code.",
+      contentType: "TEXT",
+      orderIndex: 1,
+      isRequired: true,
+      durationMinutes: 15,
+      textContent: `## The Customer Discovery Framework
+Great products solve acute, urgent, and pervasive problems.
+
+### Golden Rules of Discovery:
+1. Talk about their life and specific past behaviors, not your hypothetical idea.
+2. Ask for concrete examples of how they currently solve the problem.
+3. Listen 80% of the time, talk 20% of the time.`,
+    },
+  });
+
+  // 12. Create Seed Course 7: PENDING REVIEW Course (For Admin Review Testing!)
   const pendingCourse = await prisma.course.create({
     data: {
       title: "Modern Web Development with Next.js 15 & React 19",

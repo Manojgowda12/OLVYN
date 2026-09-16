@@ -11,7 +11,8 @@ import {
   AlertTriangle,
   FileEdit,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Sparkles
 } from "lucide-react";
 
 export const revalidate = 0;
@@ -19,7 +20,7 @@ export const revalidate = 0;
 export default async function ContributorDashboard() {
   const session = await getSession();
 
-  if (!session || (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN")) {
+  if (!session) {
     redirect("/login?redirect=/contributor");
   }
 
@@ -40,143 +41,148 @@ export default async function ContributorDashboard() {
   const rejected = courses.filter((c) => c.status === "REJECTED");
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div className="min-h-screen bg-[#f6f8f5] py-10 px-6 lg:px-12 max-w-7xl mx-auto w-full text-[#121417]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-6 border-b border-slate-200">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
-            Creator Studio
-          </span>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mt-1">
-            Course Management
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#121417] text-[#d2f835] text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#d2f835]" />
+            <span>Open Creator Studio</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-[#121417] tracking-tight">
+            Curriculum Authoring & Management
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Author and structure your courses, add modules & lessons, and submit for editorial review.
+          <p className="text-sm sm:text-base font-medium text-[#475467] mt-1.5 max-w-xl">
+            Author open curricula, attach video lessons, and submit your syllabus for editorial review.
           </p>
         </div>
 
         <Link
           href="/contributor/courses/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-500/25 transition-all self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#121417] hover:bg-black text-[#d2f835] text-xs font-black shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          Create New Course
+          <span>Create New Course</span>
         </Link>
       </div>
 
-      {/* Overview Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <p className="text-xs text-slate-400 font-medium">Drafts</p>
-          <p className="text-2xl font-bold text-white mt-1">{drafts.length}</p>
+      {/* Overview Stats (4-grid) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 mb-12">
+        <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Drafts</p>
+          <p className="text-3xl font-black text-[#121417] mt-1">{drafts.length}</p>
         </div>
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <p className="text-xs text-amber-400 font-medium">Pending Review</p>
-          <p className="text-2xl font-bold text-white mt-1">{pending.length}</p>
+        <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-amber-600">In Review</p>
+          <p className="text-3xl font-black text-[#121417] mt-1">{pending.length}</p>
         </div>
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <p className="text-xs text-emerald-400 font-medium">Published</p>
-          <p className="text-2xl font-bold text-white mt-1">{published.length}</p>
+        <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">Published</p>
+          <p className="text-3xl font-black text-[#121417] mt-1">{published.length}</p>
         </div>
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <p className="text-xs text-red-400 font-medium">Needs Revisions</p>
-          <p className="text-2xl font-bold text-white mt-1">{rejected.length}</p>
+        <div className="p-6 rounded-3xl bg-white border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-rose-600">Revisions</p>
+          <p className="text-3xl font-black text-[#121417] mt-1">{rejected.length}</p>
         </div>
       </div>
 
       {/* Courses List */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white mb-4">Your Authored Courses</h2>
+      <div className="space-y-5">
+        <h2 className="text-2xl font-black text-[#121417] tracking-tight">Your Authored Courses</h2>
 
         {courses.length === 0 ? (
-          <div className="text-center py-16 p-8 rounded-2xl bg-slate-900/30 border border-slate-800">
-            <PenTool className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white">No courses created yet</h3>
-            <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
-              Start building your first open educational course and share your expertise with the world.
+          <div className="text-center py-16 p-8 rounded-3xl bg-white border border-black/10 shadow-xs">
+            <PenTool className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-[#121417]">No courses authored yet</h3>
+            <p className="text-sm font-medium text-slate-500 mt-1 max-w-sm mx-auto">
+              Start building your first open educational course and submit for review.
             </p>
             <Link
               href="/contributor/courses/new"
-              className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-full bg-[#121417] hover:bg-black text-[#d2f835] text-xs font-black transition-colors"
             >
               <Plus className="w-4 h-4" /> Start First Course
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-slate-800 rounded-2xl bg-slate-900/70 border border-slate-800 overflow-hidden">
+          <div className="space-y-4">
             {courses.map((course) => {
               const totalLessons = course.modules.reduce((acc, m) => acc + m.lessons.length, 0);
 
               const statusBadge = {
                 DRAFT: (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                     Draft
                   </span>
                 ),
                 PENDING_REVIEW: (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> In Review
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" /> Awaiting Admin Approval
                   </span>
                 ),
                 PUBLISHED: (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Published
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Live & Published
                   </span>
                 ),
                 REJECTED: (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" /> Revision Needed
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200 flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5" /> Revision Requested
                   </span>
                 ),
               }[course.status as "DRAFT" | "PENDING_REVIEW" | "PUBLISHED" | "REJECTED"];
 
               return (
-                <div key={course.id} className="p-5 flex flex-col gap-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
+                <div
+                  key={course.id}
+                  className="p-6 sm:p-7 rounded-3xl bg-white border border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-all flex flex-col gap-4"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {statusBadge}
                         {course.category && (
-                          <span className="text-xs text-blue-400 font-medium">
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                             {course.category.name}
                           </span>
                         )}
                       </div>
-                      <h3 className="text-lg font-bold text-white">{course.title}</h3>
-                      <p className="text-xs text-slate-400">
-                        {course.modules.length} modules • {totalLessons} lessons • Difficulty: {course.difficulty}
+                      <h3 className="text-xl font-bold text-[#121417] leading-snug">{course.title}</h3>
+                      <p className="text-xs font-medium text-slate-500">
+                        {course.modules.length} modules • {totalLessons} lessons • Difficulty: {course.difficulty.replace("_", " ")}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
                       {course.status === "PUBLISHED" && (
                         <Link
                           href={`/courses/${course.slug}`}
-                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors flex items-center gap-1"
+                          className="px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-[#121417] transition-colors flex items-center gap-1.5"
                         >
-                          View Live <ExternalLink className="w-3 h-3" />
+                          <span>View Live</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                       )}
 
                       <Link
                         href={`/contributor/courses/${course.id}/edit`}
-                        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5"
+                        className="px-5 py-2.5 rounded-full bg-[#121417] hover:bg-black text-xs font-black text-[#d2f835] shadow-md transition-all flex items-center gap-1.5 active:scale-[0.98]"
                       >
                         <FileEdit className="w-3.5 h-3.5" />
-                        Course Studio
+                        <span>Edit Course</span>
                       </Link>
                     </div>
                   </div>
 
                   {/* Rejection Notice & Feedback Banner */}
                   {course.status === "REJECTED" && course.rejectionReason && (
-                    <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300 space-y-1">
-                      <p className="font-bold flex items-center gap-1.5 text-red-400">
-                        <AlertTriangle className="w-4 h-4" /> Editorial Feedback from Reviewer:
+                    <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-1 mt-1">
+                      <p className="font-bold flex items-center gap-1.5 text-rose-700">
+                        <AlertTriangle className="w-4 h-4 text-rose-600" /> Editorial Revision Feedback from Admin:
                       </p>
-                      <p className="pl-5 text-slate-300 italic">&ldquo;{course.rejectionReason}&rdquo;</p>
-                      <p className="pl-5 text-[11px] text-slate-400">
-                        Please update your course structure or content in the Course Studio and resubmit for review.
+                      <p className="pl-5 text-rose-800 font-medium italic">&ldquo;{course.rejectionReason}&rdquo;</p>
+                      <p className="pl-5 text-[11px] text-rose-600">
+                        Please update your course structure or lesson videos in the editor and click &ldquo;Submit for Review&rdquo; again.
                       </p>
                     </div>
                   )}
@@ -189,3 +195,4 @@ export default async function ContributorDashboard() {
     </div>
   );
 }
+

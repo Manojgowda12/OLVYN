@@ -41,7 +41,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div className="min-h-screen bg-[#f6f8f5] py-10 px-6 lg:px-12 max-w-5xl mx-auto w-full text-[#121417]">
       <ReviewInspector course={course} />
     </div>
   );

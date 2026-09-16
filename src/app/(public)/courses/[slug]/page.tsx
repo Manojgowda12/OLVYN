@@ -24,20 +24,20 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
   const firstLesson = course.modules[0]?.lessons[0];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-      {/* Top Banner / Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-400 mb-6">
-        <Link href="/explore" className="hover:text-white transition-colors">Courses</Link>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full text-slate-900">
+      {/* Top Breadcrumb */}
+      <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-6">
+        <Link href="/explore" className="hover:text-slate-900 transition-colors">Courses</Link>
         <span>/</span>
         {course.category && (
           <>
-            <Link href={`/explore?category=${course.category.slug}`} className="hover:text-white transition-colors">
+            <Link href={`/explore?category=${course.category.slug}`} className="hover:text-slate-900 transition-colors">
               {course.category.name}
             </Link>
             <span>/</span>
           </>
         )}
-        <span className="text-slate-200 truncate">{course.title}</span>
+        <span className="text-slate-800 font-semibold truncate">{course.title}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -45,60 +45,60 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
         <div className="lg:col-span-2 space-y-10">
           {/* Header */}
           <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
+            <div className="flex flex-wrap items-center gap-2 mb-3.5">
               {course.category && (
-                <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-600 border border-rose-200/70">
                   {course.category.name}
                 </span>
               )}
-              <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                {course.difficulty}
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                {course.difficulty ? course.difficulty.replace("_", " ") : "All Levels"}
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
               {course.title}
             </h1>
 
-            <p className="text-slate-300 text-base sm:text-lg mt-3 leading-relaxed">
+            <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
               {course.shortSummary}
             </p>
 
             {/* Author bar */}
-            <div className="flex items-center gap-3 mt-6 pt-4 border-t border-slate-800/80">
+            <div className="flex items-center gap-3.5 mt-6 pt-5 border-t border-slate-200/80">
               {course.author.avatarUrl ? (
                 <img
                   src={course.author.avatarUrl}
                   alt={course.author.name}
-                  className="w-10 h-10 rounded-full object-cover border border-slate-700"
+                  className="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-xs"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+                <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200">
                   <User className="w-5 h-5" />
                 </div>
               )}
               <div>
-                <p className="text-xs text-slate-400">Created by</p>
-                <p className="text-sm font-semibold text-white">{course.author.name}</p>
+                <p className="text-xs text-slate-500 font-medium">Curriculum Author</p>
+                <p className="text-sm font-bold text-slate-900">{course.author.name}</p>
               </div>
             </div>
           </div>
 
           {/* Description Content */}
-          <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800">
-            <h2 className="text-xl font-bold text-white mb-4">About this Course</h2>
-            <div className="prose-dark whitespace-pre-line text-sm text-slate-300 leading-relaxed">
+          <div className="p-7 rounded-3xl bg-white border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">About this Course</h2>
+            <div className="whitespace-pre-line text-sm text-slate-600 leading-relaxed font-normal">
               {course.description}
             </div>
           </div>
 
-          {/* Complete Course Syllabus (Modules & Lessons) */}
+          {/* Complete Course Syllabus */}
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="text-xl font-bold text-white">Complete Course Syllabus</h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  {course.modules.length} modules • {course.totalLessons} lessons
+                <h2 className="text-2xl font-bold text-slate-900">Complete Course Syllabus</h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  {course.modules.length} modules • {course.totalLessons} structured lessons • Full transparency
                 </p>
               </div>
             </div>
@@ -107,62 +107,62 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
               {course.modules.map((module, mIdx) => (
                 <div
                   key={module.id}
-                  className="rounded-2xl bg-slate-900/70 border border-slate-800 overflow-hidden"
+                  className="rounded-2xl bg-white border border-slate-200/80 shadow-xs overflow-hidden"
                 >
-                  <div className="p-4 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between">
+                  <div className="p-4 sm:p-5 bg-slate-50/80 border-b border-slate-200/70 flex items-center justify-between">
                     <div>
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-blue-400">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600">
                         Module {mIdx + 1}
                       </span>
-                      <h3 className="text-base font-bold text-white mt-0.5">{module.title}</h3>
+                      <h3 className="text-base font-bold text-slate-900 mt-0.5">{module.title}</h3>
                       {module.description && (
-                        <p className="text-xs text-slate-400 mt-1">{module.description}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{module.description}</p>
                       )}
                     </div>
-                    <span className="text-xs text-slate-500 font-medium">
+                    <span className="text-xs text-slate-500 font-semibold px-2.5 py-1 rounded-full bg-white border border-slate-200">
                       {module.lessons.length} lessons
                     </span>
                   </div>
 
-                  <div className="divide-y divide-slate-800/60">
+                  <div className="divide-y divide-slate-100">
                     {module.lessons.map((lesson, lIdx) => {
                       const isDone = course.progress[lesson.id];
                       return (
                         <div
                           key={lesson.id}
-                          className="p-3.5 px-4 flex items-center justify-between hover:bg-slate-800/40 transition-colors"
+                          className="p-3.5 sm:px-5 flex items-center justify-between hover:bg-slate-50/60 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3.5">
                             {course.isEnrolled ? (
                               isDone ? (
-                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                               ) : (
-                                <Circle className="w-4 h-4 text-slate-600 shrink-0" />
+                                <Circle className="w-4 h-4 text-slate-300 shrink-0" />
                               )
                             ) : (
-                              <span className="text-xs font-mono text-slate-500 w-4 text-center">
+                              <span className="text-xs font-mono font-medium text-slate-400 w-5 text-center">
                                 {lIdx + 1}
                               </span>
                             )}
                             <div>
-                              <p className="text-sm font-medium text-slate-200">{lesson.title}</p>
+                              <p className="text-sm font-semibold text-slate-800">{lesson.title}</p>
                               {lesson.description && (
-                                <p className="text-xs text-slate-400 line-clamp-1">{lesson.description}</p>
+                                <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{lesson.description}</p>
                               )}
                             </div>
                           </div>
 
                           <div className="flex items-center gap-3">
                             {lesson.durationMinutes && (
-                              <span className="text-xs text-slate-500 flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
+                              <span className="text-xs text-slate-400 flex items-center gap-1 font-medium">
+                                <Clock className="w-3.5 h-3.5" />
                                 {lesson.durationMinutes}m
                               </span>
                             )}
                             {course.isEnrolled && (
                               <Link
                                 href={`/learn/${course.slug}/${lesson.slug}`}
-                                className="text-xs font-medium text-blue-400 hover:text-blue-300"
+                                className="text-xs font-semibold text-rose-600 hover:text-rose-700 px-2.5 py-1 rounded-full hover:bg-rose-50 transition-colors"
                               >
                                 View
                               </Link>
@@ -178,11 +178,11 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
           </div>
         </div>
 
-        {/* Sidebar Sticky Column */}
+        {/* Sidebar Column */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 rounded-2xl bg-slate-900/80 border border-slate-800 p-6 shadow-xl space-y-6">
+          <div className="sticky top-24 rounded-3xl bg-white border border-slate-200/80 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] space-y-6">
             {course.thumbnailUrl && (
-              <div className="aspect-video w-full rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+              <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/60">
                 <img
                   src={course.thumbnailUrl}
                   alt={course.title}
@@ -193,40 +193,40 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
 
             {/* Course Meta Stats */}
             <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-800">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5 text-blue-400" /> Difficulty
+              <div className="flex items-center justify-between text-xs py-2 border-b border-slate-100">
+                <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+                  <BarChart3 className="w-4 h-4 text-rose-500" /> Difficulty Level
                 </span>
-                <span className="font-semibold text-white">{course.difficulty}</span>
+                <span className="font-bold text-slate-800">{course.difficulty ? course.difficulty.replace("_", " ") : "All Levels"}</span>
               </div>
-              <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-800">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-400" /> Total Lessons
+              <div className="flex items-center justify-between text-xs py-2 border-b border-slate-100">
+                <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+                  <BookOpen className="w-4 h-4 text-indigo-500" /> Total Lessons
                 </span>
-                <span className="font-semibold text-white">{course.totalLessons}</span>
+                <span className="font-bold text-slate-800">{course.totalLessons}</span>
               </div>
               {course.estimatedHours && (
-                <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-800">
-                  <span className="text-slate-400 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-emerald-400" /> Estimated Duration
+                <div className="flex items-center justify-between text-xs py-2 border-b border-slate-100">
+                  <span className="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <Clock className="w-4 h-4 text-emerald-500" /> Estimated Time
                   </span>
-                  <span className="font-semibold text-white">{course.estimatedHours} hrs</span>
+                  <span className="font-bold text-slate-800">{course.estimatedHours} hrs</span>
                 </div>
               )}
             </div>
 
-            {/* Enrollment / Learning Action CTA */}
+            {/* Action CTA */}
             {course.isEnrolled ? (
               <div className="space-y-3">
                 {course.courseProgress && (
                   <div>
-                    <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
-                      <span className="text-slate-400">Your Progress</span>
-                      <span className="text-blue-400">{course.courseProgress.percentage}%</span>
+                    <div className="flex items-center justify-between text-xs mb-1.5 font-semibold">
+                      <span className="text-slate-600">Your Progress</span>
+                      <span className="text-rose-600">{course.courseProgress.percentage}%</span>
                     </div>
-                    <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
                       <div
-                        className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-rose-500 to-rose-600 rounded-full transition-all duration-500"
                         style={{ width: `${course.courseProgress.percentage}%` }}
                       />
                     </div>
@@ -235,31 +235,32 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
 
                 <Link
                   href={firstLesson ? `/learn/${course.slug}/${firstLesson.slug}` : `/dashboard`}
-                  className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-5 rounded-full bg-slate-900 hover:bg-black text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 group"
                 >
-                  Continue Learning
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Continue Learning</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             ) : (
-              <form action={`/api/courses/${course.id}/enroll`} method="POST">
+              <form action={`/api/courses/${course.id}/enroll`} method="POST" suppressHydrationWarning>
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white font-semibold text-sm shadow-[0_4px_20px_rgba(244,63,94,0.3)] transition-all flex items-center justify-center gap-2 group"
+                  suppressHydrationWarning
                 >
-                  Enroll in Course (Free)
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Enroll in Course (Free)</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </form>
             )}
 
             {/* Nova AI Helper teaser */}
-            <div className="p-4 rounded-xl bg-violet-950/20 border border-violet-500/20 flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-violet-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200/60 flex items-start gap-3">
+              <Sparkles className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-violet-300">Nova AI Tutor Included</p>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Get instant explanations, code breakdowns, and quizzes while taking this course.
+                <p className="text-xs font-bold text-indigo-950">Nova AI Tutor Included</p>
+                <p className="text-[11px] text-indigo-700 mt-1 leading-relaxed">
+                  Interactive AI assistance grounded in this course's specific markdown lessons.
                 </p>
               </div>
             </div>

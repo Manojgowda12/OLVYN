@@ -9,8 +9,8 @@ export async function PUT(
 ) {
   const session = await getSession();
 
-  if (!session || (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN")) {
-    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   const { id: courseId } = await params;
