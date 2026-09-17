@@ -154,18 +154,18 @@ export function NovaChatView() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-10 flex flex-col min-h-[calc(100vh-140px)] text-[#121417]">
+    <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-10 flex flex-col min-h-[calc(100vh-140px)] text-slate-900">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-200">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#121417] text-[#d2f835] text-xs font-black uppercase tracking-wider shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900 text-[#d2f835] text-xs font-black uppercase tracking-wider shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-[#d2f835]" />
             <span>Live AI Learning Companion</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-[#121417] tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Nova AI Tutor
           </h1>
-          <p className="text-xs sm:text-sm font-medium text-[#475467] max-w-xl">
+          <p className="text-xs sm:text-sm font-medium text-slate-600 max-w-xl">
             Grounded in our live course database. Ask questions, plan study schedules, and practice concepts.
           </p>
         </div>

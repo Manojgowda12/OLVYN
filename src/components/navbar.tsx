@@ -6,38 +6,38 @@ export async function Navbar() {
   const session = await getSession();
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#f6f8f5]/90 backdrop-blur-md border-b border-black/5">
+    <header className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       <div className="max-w-7xl mx-auto h-20 px-6 lg:px-12 flex items-center justify-between">
         {/* Brand Wordmark with vibrant badge dot */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-[#121417] flex items-center justify-center text-[#d2f835] shadow-xs group-hover:rotate-6 transition-transform">
+          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-[#d2f835] shadow-xs group-hover:rotate-6 transition-transform">
             <BookOpen className="w-5 h-5 text-[#d2f835]" />
           </div>
-          <span className="font-extrabold text-[22px] tracking-tight text-[#121417]">
-            OpenLearner<span className="text-[#d2f835] bg-[#121417] px-1 rounded-sm ml-0.5 text-sm font-black">AI</span>
+          <span className="font-extrabold text-[22px] tracking-tight text-slate-900">
+            OpenLearner<span className="text-[#d2f835] bg-slate-900 px-1 rounded-sm ml-0.5 text-sm font-black">AI</span>
           </span>
         </Link>
 
         {/* Center Links */}
-        <nav className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-[#121417]">
-          <Link href="/" className="hover:text-black transition-colors">
+        <nav className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-slate-700">
+          <Link href="/" className="hover:text-slate-900 transition-colors">
             Home
           </Link>
-          <Link href="/explore" className="hover:text-black transition-colors">
+          <Link href="/explore" className="hover:text-slate-900 transition-colors">
             Courses
           </Link>
-          <Link href="/#categories" className="hover:text-black transition-colors">
+          <Link href="/#categories" className="hover:text-slate-900 transition-colors">
             Categories
           </Link>
-          <Link href="/nova" className="flex items-center gap-1.5 hover:text-black transition-colors">
-            <Sparkles className="w-3.5 h-3.5 text-[#121417]" />
+          <Link href="/nova" className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
+            <Sparkles className="w-3.5 h-3.5 text-slate-900" />
             <span>Nova AI</span>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-[#d2f835] text-[#121417] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#121417] animate-pulse"></span>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-[#d2f835] text-slate-900 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 animate-pulse"></span>
               Live
             </span>
           </Link>
-          <Link href="/contributor" className="hover:text-black transition-colors">
+          <Link href="/contributor" className="hover:text-slate-900 transition-colors">
             Studio
           </Link>
         </nav>

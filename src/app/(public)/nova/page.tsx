@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function NovaPage() {
   return (
-    <div className="min-h-screen bg-[#f6f8f5]">
+    <div className="min-h-screen bg-slate-50">
       <NovaChatView />
     </div>
   );

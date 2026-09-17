@@ -48,17 +48,17 @@ export default async function AdminDashboard() {
   ]);
 
   return (
-    <div className="min-h-screen bg-[#f6f8f5] py-10 px-6 lg:px-12 max-w-7xl mx-auto w-full text-[#121417]">
+    <div className="min-h-screen bg-slate-50 py-10 px-6 lg:px-12 max-w-7xl mx-auto w-full text-slate-900">
       {/* Header Banner */}
       <div className="mb-10 pb-6 border-b border-slate-200">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#121417] text-[#d2f835] text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900 text-[#d2f835] text-xs font-black uppercase tracking-wider mb-3 shadow-xs">
           <ShieldAlert className="w-3.5 h-3.5 text-[#d2f835]" />
           <span>Editorial Administration Console</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-[#121417] tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
           Curriculum Moderation & Admin
         </h1>
-        <p className="text-sm sm:text-base font-medium text-[#475467] mt-1.5 max-w-2xl">
+        <p className="text-sm sm:text-base font-medium text-slate-600 mt-1.5 max-w-2xl">
           Review open learner video submissions, enforce syllabus depth standards, and manage published platform courses.
         </p>
       </div>

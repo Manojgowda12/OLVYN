@@ -56,21 +56,21 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-[#f6f8f5]">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#121417] text-[#d2f835] shadow-md mb-4 hover:scale-105 transition-transform">
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900 text-[#d2f835] shadow-md mb-4 hover:scale-105 transition-transform">
             <BookOpen className="w-6 h-6 text-[#d2f835]" />
           </Link>
-          <h1 className="text-3xl font-black tracking-tight text-[#121417]">Welcome back</h1>
-          <p className="text-sm font-medium text-[#475467] mt-1.5">
+          <h1 className="text-3xl font-black tracking-tight text-slate-900">Welcome back</h1>
+          <p className="text-sm font-medium text-slate-600 mt-1.5">
             Sign in to continue learning, teaching, and managing courses
           </p>
         </div>
 
         {/* Card */}
-        <div className="p-7 sm:p-9 rounded-3xl bg-white border border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+        <div className="p-7 sm:p-9 rounded-3xl bg-white border border-slate-200/80 shadow-[0_8px_30px_rgba(15,23,42,0.06)]">
           {error && (
             <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />

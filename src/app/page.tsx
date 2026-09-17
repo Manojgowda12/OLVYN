@@ -57,25 +57,25 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f8f5] text-[#121417] relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
       {/* ========================================================================= */}
       {/* 1. HERO SECTION (OpenLearner AI Core Value: Transparent Syllabi & AI)    */}
       {/* ========================================================================= */}
       <section className="pt-14 pb-16 px-6 max-w-7xl mx-auto relative">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           {/* Lime Pill Eyebrow */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#d2f835] text-[#121417] text-xs font-black tracking-wide shadow-xs">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#d2f835] text-slate-900 text-xs font-black tracking-wide shadow-xs">
             <Sparkles className="w-3.5 h-3.5 fill-black text-black" />
             <span>Open Learning Platform with Grounded AI Tutoring</span>
           </div>
 
           {/* Core Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-[64px] font-black text-[#121417] leading-[1.08] tracking-tight">
+          <h1 className="text-4xl sm:text-6xl lg:text-[64px] font-black text-slate-900 leading-[1.08] tracking-tight">
             Learn with Complete Syllabus Transparency & AI Guidance
           </h1>
 
           {/* Authentic Subtitle */}
-          <p className="text-lg sm:text-xl font-medium text-[#475467] max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl font-medium text-slate-600 max-w-2xl mx-auto">
             Explore verified open curricula, track your exact progress from 0% to 100%, and get instant answers from Nova AI at every lesson.
           </p>
 
@@ -84,7 +84,7 @@ export default async function HomePage() {
             <form
               method="GET"
               action="/explore"
-              className="p-2 bg-white rounded-full border border-black/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-black/20 transition-all flex items-center justify-between gap-3"
+              className="p-2 bg-white rounded-full border border-slate-200/90 shadow-[0_8px_30px_rgba(15,23,42,0.06)] hover:border-slate-300 transition-all flex items-center justify-between gap-3"
               suppressHydrationWarning
             >
               <div className="flex-1 flex items-center pl-4 gap-3">
@@ -93,14 +93,14 @@ export default async function HomePage() {
                   type="text"
                   name="q"
                   placeholder="Search Python, React, UI/UX, AI, Data Science..."
-                  className="w-full bg-transparent text-sm sm:text-base text-[#121417] placeholder:text-slate-400 focus:outline-none py-2 font-medium"
+                  className="w-full bg-transparent text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none py-2 font-medium"
                   suppressHydrationWarning
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-[#d2f835] hover:bg-[#c4ec23] active:scale-[0.98] text-[#121417] font-black text-sm px-7 py-3 rounded-full flex items-center gap-2 transition-all flex-shrink-0 shadow-xs cursor-pointer"
+                className="bg-[#d2f835] hover:bg-[#c4ec23] active:scale-[0.98] text-slate-900 font-black text-sm px-7 py-3 rounded-full flex items-center gap-2 transition-all flex-shrink-0 shadow-xs cursor-pointer"
                 suppressHydrationWarning
               >
                 <span>Search</span>
@@ -115,7 +115,7 @@ export default async function HomePage() {
               <Link
                 key={cat.id}
                 href={`/explore?category=${cat.slug}`}
-                className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 hover:border-slate-400 text-xs font-semibold text-[#121417] transition-colors"
+                className="px-3.5 py-1.5 rounded-full bg-white border border-slate-200 hover:border-slate-300 text-xs font-semibold text-slate-800 hover:text-slate-950 transition-colors shadow-2xs"
               >
                 {cat.name} ({cat._count.courses})
               </Link>
@@ -127,7 +127,7 @@ export default async function HomePage() {
       {/* ========================================================================= */}
       {/* 2. PLATFORM PILLARS (The 3 Core Modes: Discover, Learn, Create)          */}
       {/* ========================================================================= */}
-      <section className="bg-[#121417] text-white py-20 px-6 lg:px-12 relative">
+      <section className="bg-slate-950 text-white py-20 px-6 lg:px-12 relative border-y border-slate-800/80">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
             <div className="text-[#d2f835] text-xs font-black uppercase tracking-widest">
