@@ -141,8 +141,12 @@ export function PlayerView({
         body: JSON.stringify({
           message,
           lessonContext: {
+            courseId: course.id,
             courseTitle: course.title,
+            courseSlug: course.slug,
+            lessonId: currentLesson.id,
             lessonTitle: currentLesson.title,
+            lessonSlug: currentLesson.slug,
             textContent: currentLesson.textContent || "",
           },
         }),

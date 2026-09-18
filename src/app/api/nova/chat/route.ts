@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateAssistantResponse, ChatMessage, LessonContext } from "@/lib/ai-assistant";
+import { searchCurriculum, UserContext, UserRole, RetrievalResult } from "@/lib/retrieval";
 import { novaRateLimiter } from "@/lib/rate-limiter";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -169,14 +170,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Generate Assistant Response (With Prompt Safety & Grounding intact)
+    // 3. Curriculum Retrieval (Phase 3D Hybrid Retrieval Integration)
+    const userContext: UserContext | undefined = session
+      ? { id: session.userId, role: session.role as UserRole }
+      : undefined;
+
+    let retrievalResult: RetrievalResult | null = null;
+    try {
+      retrievalResult = await searchCurriculum(message.trim(), {
+        courseId: resolvedLessonContext?.courseId,
+        lessonId: resolvedLessonContext?.lessonId,
+        user: userContext,
+        topK: 5,
+        maxTokens: 2000,
+      });
+    } catch (retrievalErr) {
+      console.error("Nova curriculum retrieval error:", retrievalErr);
+      retrievalResult = null;
+    }
+
+    // 4. Generate Assistant Response (With Prompt Safety & Grounding intact)
     const response = await generateAssistantResponse({
       message: message.trim(),
       history: resolvedHistory,
       lessonContext: resolvedLessonContext,
+      retrievedChunks: retrievalResult?.results || [],
     });
 
-    // 4. Persist Assistant Message if active conversation
+    // 5. Persist Assistant Message if active conversation
     if (activeConversationId) {
       try {
         await db.aIMessage.create({
@@ -199,6 +220,18 @@ export async function POST(req: NextRequest) {
         referencedCourses: response.referencedCourses,
         isFallback: response.isFallback,
         modelUsed: response.modelUsed,
+        retrieval: retrievalResult
+          ? {
+              mode: retrievalResult.degradedMode || "HYBRID",
+              candidateCount: retrievalResult.totalCandidates,
+              sources: retrievalResult.results.map((r) => ({
+                courseTitle: r.courseTitle,
+                lessonTitle: r.lessonTitle,
+                sourceUrl: r.sourceUrl,
+                hybridScore: r.hybridScore,
+              })),
+            }
+          : undefined,
       },
       {
         headers: {

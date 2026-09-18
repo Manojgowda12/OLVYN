@@ -28,6 +28,7 @@ interface Message {
   content: string;
   suggestedPrompts?: string[];
   referencedCourses?: Array<{ title: string; slug: string; difficulty: string; category?: string }>;
+  sources?: Array<{ courseTitle: string; lessonTitle?: string | null; sourceUrl: string }>;
   timestamp: Date;
 }
 
@@ -225,6 +226,7 @@ export function NovaChatView() {
         content: data.reply,
         suggestedPrompts: data.suggestedPrompts,
         referencedCourses: data.referencedCourses,
+        sources: data.retrieval?.sources,
         timestamp: new Date(),
       };
 
@@ -477,6 +479,21 @@ export function NovaChatView() {
                       <div className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans">
                         {msg.content}
                       </div>
+
+                      {isAssistant && msg.sources && msg.sources.length > 0 && (
+                        <div className="pt-2 border-t border-black/5 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+                          <span className="font-semibold text-[11px] text-slate-600">📚 Curriculum:</span>
+                          {msg.sources.map((s, idx) => (
+                            <Link
+                              key={idx}
+                              href={s.sourceUrl}
+                              className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-black hover:border-black/30 transition-all font-medium text-[11px]"
+                            >
+                              {s.lessonTitle || s.courseTitle}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {!isAssistant && (
