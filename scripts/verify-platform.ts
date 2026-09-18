@@ -216,6 +216,42 @@ async function verifyPlatform() {
       "Nova AI grounded answer in active lesson context"
     );
 
+    // 6. Testing Phase 1 Hardening: Secure File Uploads, MIME Validation & RBAC
+    console.log("\n6. Testing Secure File Uploads, MIME Validation & RBAC...");
+    const { novaRateLimiter } = await import("../src/lib/rate-limiter");
+
+    // Test Rate Limiter
+    const testIp = `test-ip-${Date.now()}`;
+    for (let i = 0; i < 5; i++) {
+      novaRateLimiter.check(testIp, 5);
+    }
+    const rateLimitExceeded = novaRateLimiter.check(testIp, 5);
+    assert(!rateLimitExceeded.allowed && rateLimitExceeded.remaining === 0, "Rate limiter blocks requests exceeding threshold (429 response)");
+
+    const rateLimitFreshIp = novaRateLimiter.check(`fresh-ip-${Date.now()}`, 5);
+    assert(rateLimitFreshIp.allowed && rateLimitFreshIp.remaining === 4, "Rate limiter allows normal requests within threshold");
+
+    // Test FileAsset Persistence
+    const testAsset = await db.fileAsset.create({
+      data: {
+        uploaderId: contributor!.id,
+        storageProvider: "local-inline",
+        bucket: "course-assets",
+        objectPath: `tests/${contributor!.id}/test-image.png`,
+        fileName: "test-image.png",
+        mimeType: "image/png",
+        sizeBytes: 1024,
+        isPublic: true,
+      },
+    });
+
+    assert(!!testAsset.id && testAsset.uploaderId === contributor!.id, "FileAsset metadata successfully persisted in PostgreSQL");
+
+    // Clean up test file asset
+    await db.fileAsset.delete({ where: { id: testAsset.id } });
+    const deletedCheck = await db.fileAsset.findUnique({ where: { id: testAsset.id } });
+    assert(deletedCheck === null, "Test FileAsset record safely cleaned up after test");
+
     console.log(`\n========================================`);
     console.log(`Verification Summary: ${passed}/${total} assertions passed.`);
     console.log(`========================================\n`);

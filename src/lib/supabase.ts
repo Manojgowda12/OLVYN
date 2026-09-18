@@ -137,6 +137,29 @@ export async function uploadToSupabaseStorage(
 }
 
 /**
+ * Deletes an object from Supabase Storage bucket (used for rollback/cleanup).
+ */
+export async function deleteFromSupabaseStorage(
+  bucketName: string,
+  filePath: string
+): Promise<{ success: boolean; error?: string }> {
+  const client = getSupabaseAdmin() || getSupabase();
+  if (!client) {
+    return { success: false, error: "Supabase client not configured" };
+  }
+
+  try {
+    const { error } = await client.storage.from(bucketName).remove([filePath]);
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to delete storage object" };
+  }
+}
+
+/**
  * Checks Supabase configuration and connectivity status.
  */
 export async function checkSupabaseHealth(): Promise<{

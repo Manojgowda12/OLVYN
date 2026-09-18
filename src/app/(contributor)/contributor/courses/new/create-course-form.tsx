@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
+import { FileUpload } from "@/components/file-upload";
 
 interface Category {
   id: string;
@@ -151,16 +152,13 @@ export function CreateCourseForm({ categories }: { categories: Category[] }) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
-              Thumbnail Image URL (Optional)
-            </label>
-            <input
-              type="url"
+            <FileUpload
+              label="Course Thumbnail (Optional)"
+              helperText="Upload PNG, JPG, or WebP (max 25MB)"
               value={thumbnailUrl}
-              onChange={(e) => setThumbnailUrl(e.target.value)}
-              placeholder="https://images.unsplash.com/..."
-              className="w-full px-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] transition-all"
-              suppressHydrationWarning
+              onChange={(url) => setThumbnailUrl(url)}
+              accept="image/jpeg,image/png,image/webp"
+              folder="thumbnails"
             />
           </div>
         </div>

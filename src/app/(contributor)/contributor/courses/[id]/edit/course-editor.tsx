@@ -20,6 +20,7 @@ import {
   Play,
   X
 } from "lucide-react";
+import { FileUpload } from "@/components/file-upload";
 
 interface Lesson {
   id: string;
@@ -469,16 +470,39 @@ export function CourseEditor({ course: initialCourse }: CourseEditorProps) {
               </div>
 
               {lessonType === "VIDEO_URL" && (
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                    Video URL (YouTube or Direct Stream) *
-                  </label>
-                  <input
-                    type="url"
+                <div className="space-y-2">
+                  <FileUpload
+                    label="Lesson Video Upload (MP4)"
+                    helperText="Upload MP4 video (up to 25MB)"
+                    accept="video/mp4"
+                    folder="lessons"
                     value={lessonMediaUrl}
-                    onChange={(e) => setLessonMediaUrl(e.target.value)}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[#121417] text-xs focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
+                    onChange={(url) => setLessonMediaUrl(url)}
+                  />
+                  <div className="pt-1">
+                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                      Or paste YouTube / Stream URL
+                    </label>
+                    <input
+                      type="url"
+                      value={lessonMediaUrl}
+                      onChange={(e) => setLessonMediaUrl(e.target.value)}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-[#121417] text-xs focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {lessonType === "DOCUMENT_URL" && (
+                <div className="space-y-2">
+                  <FileUpload
+                    label="Lesson Document (PDF)"
+                    helperText="Upload PDF document (up to 25MB)"
+                    accept="application/pdf"
+                    folder="documents"
+                    value={lessonMediaUrl}
+                    onChange={(url) => setLessonMediaUrl(url)}
                   />
                 </div>
               )}
