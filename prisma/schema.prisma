@@ -79,6 +79,17 @@ enum AIMessageRole {
   SYSTEM
 }
 
+enum DocumentSourceType {
+  LESSON_CONTENT
+  UPLOADED_PDF
+}
+
+enum IndexingStatus {
+  PENDING
+  INDEXED
+  FAILED
+}
+
 // ==========================================
 // USER DOMAIN
 // ==========================================
@@ -181,6 +192,7 @@ model Course {
   reviews         CourseReview[]
   contentReports  ContentReport[]
   aiConversations AIConversation[]
+  documents       Document[]
 
   @@index([status, publishedAt])
   @@index([authorId, status])
@@ -224,6 +236,7 @@ model Lesson {
   progress        LessonProgress[]
   contentReports  ContentReport[]
   aiConversations AIConversation[]
+  documents       Document[]
 
   @@unique([moduleId, orderIndex])
   @@unique([moduleId, slug])
@@ -426,8 +439,56 @@ model FileAsset {
   isPublic        Boolean  @default(true)
   createdAt       DateTime @default(now())
 
-  uploader        User?    @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  uploader        User?       @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  documents       Document[]
 
   @@index([uploaderId])
   @@index([bucket])
+}
+
+// ==========================================
+// RAG & KNOWLEDGE BASE
+// ==========================================
+
+model Document {
+  id           String             @id @default(cuid())
+  courseId     String
+  lessonId     String?
+  fileAssetId  String?
+  sourceType   DocumentSourceType @default(LESSON_CONTENT)
+  contentHash  String?
+  status       IndexingStatus     @default(PENDING)
+  errorMessage String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  course    Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson    Lesson?         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  fileAsset FileAsset?      @relation(fields: [fileAssetId], references: [id], onDelete: Cascade)
+  chunks    DocumentChunk[]
+
+  @@index([courseId, status])
+  @@index([lessonId])
+  @@index([fileAssetId])
+  @@index([contentHash])
+}
+
+model DocumentChunk {
+  id               String                      @id @default(cuid())
+  documentId       String
+  chunkIndex       Int
+  content          String                      @db.Text
+  tokenCount       Int
+  embedding        Unsupported("vector(768)")?
+  tsvContent       Unsupported("tsvector")?
+  embeddingModel   String                      @default("gemini-embedding-2")
+  embeddingVersion String                      @default("1")
+  metadata         Json?
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, chunkIndex])
+  @@index([documentId])
 }
