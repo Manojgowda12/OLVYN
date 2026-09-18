@@ -252,6 +252,108 @@ async function verifyPlatform() {
     const deletedCheck = await db.fileAsset.findUnique({ where: { id: testAsset.id } });
     assert(deletedCheck === null, "Test FileAsset record safely cleaned up after test");
 
+    // 7. Testing Phase 2: Nova AI Persistent Conversations & Cross-User Security Isolation
+    console.log("\n7. Testing Phase 2: Nova AI Persistent Conversations & Security Isolation...");
+
+    // 7.1 Create conversation for Learner (User A)
+    const learnerConv = await db.aIConversation.create({
+      data: {
+        userId: learner!.id,
+        title: "Next.js 15 & React 19 Mastery",
+        mode: "TUTORING",
+        courseId: pythonCourse!.id,
+      },
+    });
+
+    assert(
+      !!learnerConv.id && learnerConv.userId === learner!.id && learnerConv.mode === "TUTORING",
+      "Authenticated user can create a persistent AIConversation"
+    );
+
+    // 7.2 Persist user message and assistant reply
+    const userMsg = await db.aIMessage.create({
+      data: {
+        conversationId: learnerConv.id,
+        role: "USER",
+        content: "How do React 19 Actions simplify form submissions?",
+      },
+    });
+
+    const assistantMsg = await db.aIMessage.create({
+      data: {
+        conversationId: learnerConv.id,
+        role: "ASSISTANT",
+        content: "React 19 Actions handle pending states, optimistic updates, and form resets automatically.",
+      },
+    });
+
+    assert(
+      !!userMsg.id && userMsg.role === "USER" && !!assistantMsg.id && assistantMsg.role === "ASSISTANT",
+      "User message and assistant response successfully persisted in AIMessage table"
+    );
+
+    // 7.3 Verify message ordering and conversation relation
+    const convWithMessages = await db.aIConversation.findUnique({
+      where: { id: learnerConv.id },
+      include: {
+        messages: { orderBy: { createdAt: "asc" } },
+        course: { select: { title: true } },
+      },
+    });
+
+    assert(
+      convWithMessages?.messages.length === 2 &&
+      convWithMessages.messages[0].role === "USER" &&
+      convWithMessages.messages[1].role === "ASSISTANT",
+      "Conversation messages preserved in strict chronological order"
+    );
+    assert(
+      convWithMessages?.course?.title === pythonCourse!.title,
+      "Conversation correctly anchored to verified course context"
+    );
+
+    // 7.4 Cross-User Security Isolation (User B cannot access User A's conversation)
+    const crossUserAccess = await db.aIConversation.findFirst({
+      where: {
+        id: learnerConv.id,
+        userId: contributor!.id, // Attempting to query with different user ID
+      },
+    });
+
+    assert(
+      crossUserAccess === null,
+      "Strict User ID isolation prevents User B (contributor) from accessing User A (learner)'s conversation"
+    );
+
+    // 7.5 Verify User-specific Conversation Listing
+    const learnerConversations = await db.aIConversation.findMany({
+      where: { userId: learner!.id },
+    });
+    const contributorConversations = await db.aIConversation.findMany({
+      where: { userId: contributor!.id },
+    });
+
+    assert(
+      learnerConversations.some((c) => c.id === learnerConv.id),
+      "Learner conversation listing includes user's owned conversation"
+    );
+    assert(
+      !contributorConversations.some((c) => c.id === learnerConv.id),
+      "Contributor conversation listing strictly excludes other users' conversations"
+    );
+
+    // 7.6 Cascade Deletion (Deleting conversation purges all associated messages)
+    await db.aIConversation.delete({ where: { id: learnerConv.id } });
+    const deletedConvCheck = await db.aIConversation.findUnique({ where: { id: learnerConv.id } });
+    const orphanMessagesCheck = await db.aIMessage.findMany({
+      where: { conversationId: learnerConv.id },
+    });
+
+    assert(
+      deletedConvCheck === null && orphanMessagesCheck.length === 0,
+      "Deleting conversation cascades cleanly and deletes all associated AIMessage records"
+    );
+
     console.log(`\n========================================`);
     console.log(`Verification Summary: ${passed}/${total} assertions passed.`);
     console.log(`========================================\n`);
