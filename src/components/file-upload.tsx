@@ -174,6 +174,7 @@ export function FileUpload({
                 <img
                   src={previewUrl}
                   alt="Preview"
+                  decoding="async"
                   className="w-12 h-12 object-cover rounded-lg border border-slate-200 shadow-sm shrink-0"
                 />
               ) : previewUrl.endsWith(".pdf") ? (

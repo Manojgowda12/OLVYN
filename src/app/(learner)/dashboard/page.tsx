@@ -141,6 +141,8 @@ export default async function LearnerDashboard() {
                       <img
                         src={course.thumbnailUrl}
                         alt={course.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                       {isDone ? (

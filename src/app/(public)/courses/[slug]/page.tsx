@@ -70,6 +70,10 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
                 <img
                   src={course.author.avatarUrl}
                   alt={course.author.name}
+                  width={44}
+                  height={44}
+                  loading="lazy"
+                  decoding="async"
                   className="w-11 h-11 rounded-full object-cover border border-slate-200 shadow-xs"
                 />
               ) : (
@@ -186,6 +190,8 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
                 <img
                   src={course.thumbnailUrl}
                   alt={course.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
