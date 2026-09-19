@@ -90,20 +90,32 @@ enum IndexingStatus {
   FAILED
 }
 
+enum MemoryType {
+  PREFERENCE
+  LEARNING_CONTEXT
+  GOAL
+  SKILL
+  DIFFICULTY
+  STUDY_HABIT
+  INTEREST
+}
+
 // ==========================================
 // USER DOMAIN
 // ==========================================
 
 model User {
   id              String        @id @default(cuid())
+  authUserId      String?       @unique
   email           String        @unique
   normalizedEmail String        @unique
-  passwordHash    String
+  passwordHash    String?
   name            String
   role            Role          @default(LEARNER)
   status          AccountStatus @default(ACTIVE)
   bio             String?
   avatarUrl       String?
+  memoryEnabled   Boolean       @default(true)
   lastLoginAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -119,9 +131,11 @@ model User {
   resolvedReports ContentReport[]  @relation("AdminResolvedReports")
   aiConversations AIConversation[]
   uploadedFiles   FileAsset[]
+  memories        UserMemory[]
 
   @@index([role, status])
   @@index([createdAt])
+  @@index([authUserId])
 }
 
 // ==========================================
@@ -403,9 +417,10 @@ model AIConversation {
   updatedAt DateTime    @updatedAt
 
   user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course?     @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  lesson    Lesson?     @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  messages  AIMessage[]
+  course            Course?          @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  lesson            Lesson?          @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  messages          AIMessage[]
+  memoriesExtracted UserMemory[]
 
   @@index([userId, createdAt])
   @@index([courseId])
@@ -421,6 +436,29 @@ model AIMessage {
   conversation   AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId, createdAt])
+}
+
+model UserMemory {
+  id                   String          @id @default(cuid())
+  userId               String
+  memoryType           MemoryType
+  key                  String
+  value                String          @db.Text
+  source               String          @default("CONVERSATION")
+  sourceConversationId String?
+  importance           Int             @default(1)
+  confidence           Float           @default(1.0)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  lastUsedAt           DateTime?
+  metadata             Json?
+
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceConversation AIConversation? @relation(fields: [sourceConversationId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, memoryType, key])
+  @@index([userId, memoryType])
+  @@index([userId, updatedAt])
 }
 
 // ==========================================

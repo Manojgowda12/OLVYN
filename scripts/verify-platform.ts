@@ -32,8 +32,9 @@ async function verifyPlatform() {
     assert(!!learner && learner.role === "LEARNER", "Learner exists with LEARNER role");
 
     // Test permanent admin password verification
-    const isAdminPasswordValid = await bcrypt.compare(adminPassword, admin!.passwordHash) || await bcrypt.compare("Admin123!", admin!.passwordHash);
-    assert(isAdminPasswordValid, "Permanent Admin password hash verification succeeds");
+    const adminHash = admin?.passwordHash || "";
+    const isAdminPasswordValid = adminHash ? (await bcrypt.compare(adminPassword, adminHash) || await bcrypt.compare("Admin123!", adminHash)) : false;
+    assert(Boolean(isAdminPasswordValid), "Permanent Admin password hash verification succeeds");
 
     // 2. Testing Course Discovery & Published Status Filter
     console.log("\n2. Testing Course Catalog & Discovery Filters...");

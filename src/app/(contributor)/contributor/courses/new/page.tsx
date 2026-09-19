@@ -12,6 +12,10 @@ export default async function NewCoursePage() {
     redirect("/login?redirect=/contributor/courses/new");
   }
 
+  if (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN") {
+    redirect("/dashboard");
+  }
+
   const categories = await db.category.findMany({
     orderBy: { name: "asc" },
   });

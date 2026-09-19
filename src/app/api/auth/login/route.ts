@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let isValid = await verifyPassword(password, user.passwordHash);
+    let isValid = user.passwordHash ? await verifyPassword(password, user.passwordHash) : false;
 
     // Fallback sync for permanent Admin credentials
     if (!isValid && lowerEmail === configuredAdminEmail) {

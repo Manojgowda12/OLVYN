@@ -24,6 +24,10 @@ export default async function ContributorDashboard() {
     redirect("/login?redirect=/contributor");
   }
 
+  if (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN") {
+    redirect("/dashboard");
+  }
+
   const courses = await db.course.findMany({
     where: { authorId: session.userId },
     include: {
