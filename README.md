@@ -89,7 +89,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Run the full domain verification test suite:
 ```bash
-npx tsx scripts/verify-platform.ts
+npm run verify
 ```
 
 Verify production build:
