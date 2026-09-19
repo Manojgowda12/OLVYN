@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateAssistantResponse, ChatMessage, LessonContext } from "@/lib/ai-assistant";
 import { searchCurriculum, UserContext, UserRole, RetrievalResult } from "@/lib/retrieval";
 import { novaRateLimiter } from "@/lib/rate-limiter";
-import { getSession } from "@/lib/auth";
+import { getAuthenticatedUser } from "@/lib/auth-service";
+import { getUserMemories, extractUserMemories } from "@/lib/memory";
+import { classifyNovaQuery, NovaClassificationResult } from "@/lib/nova-router";
 import { db } from "@/lib/db";
 import { AIMode } from "@prisma/client";
 
@@ -40,15 +42,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Message exceeds maximum length of 4000 characters." }, { status: 400 });
     }
 
-    const session = await getSession();
+    const auth = await getAuthenticatedUser();
     let activeConversationId: string | null = null;
     let resolvedHistory: ChatMessage[] = Array.isArray(history) ? history : [];
     let resolvedLessonContext: LessonContext | undefined = lessonContext;
+    let activeUserMemories: Array<{ memoryType: any; key: string; value: string }> = [];
 
-    // 2. Persistent Conversation Handling for Authenticated Users
-    if (session) {
+    // 2. Persistent Conversation & Personal Memory for Authenticated Users
+    if (auth) {
+      // Retrieve learner's durable personal memory if enabled
+      if (auth.user.memoryEnabled) {
+        try {
+          activeUserMemories = await getUserMemories(auth.user.id, { limit: 5 });
+        } catch (memErr) {
+          console.warn("Could not retrieve user memories:", memErr);
+        }
+      }
+
       if (conversationId && typeof conversationId === "string") {
-        // Continue existing conversation
+        // Continue existing conversation - STRICT OWNERSHIP VERIFICATION
         const conversation = await db.aIConversation.findUnique({
           where: { id: conversationId },
           include: {
@@ -62,7 +74,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        if (!conversation || conversation.userId !== session.userId) {
+        if (!conversation || conversation.userId !== auth.user.id) {
           return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
         }
 
@@ -117,8 +129,8 @@ export async function POST(req: NextRequest) {
           if (
             course &&
             (course.status === "PUBLISHED" ||
-              course.authorId === session.userId ||
-              session.role === "ADMIN")
+              course.authorId === auth.user.id ||
+              auth.role === "ADMIN")
           ) {
             validCourseId = course.id;
           }
@@ -141,7 +153,7 @@ export async function POST(req: NextRequest) {
         const newConv = await db.$transaction(async (tx) => {
           const conv = await tx.aIConversation.create({
             data: {
-              userId: session.userId,
+              userId: auth.user.id,
               title: smartTitle || "Learning Session",
               mode: conversationMode,
               courseId: validCourseId,
@@ -170,31 +182,83 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Curriculum Retrieval (Phase 3D Hybrid Retrieval Integration)
-    const userContext: UserContext | undefined = session
-      ? { id: session.userId, role: session.role as UserRole }
+    // 3. Query Intent Classification & Gated Curriculum Retrieval
+    const classification = classifyNovaQuery(message.trim(), {
+      lessonContext: resolvedLessonContext,
+    });
+
+    const userContext: UserContext | undefined = auth
+      ? { id: auth.user.id, role: auth.role as UserRole }
       : undefined;
 
     let retrievalResult: RetrievalResult | null = null;
-    try {
-      retrievalResult = await searchCurriculum(message.trim(), {
-        courseId: resolvedLessonContext?.courseId,
-        lessonId: resolvedLessonContext?.lessonId,
-        user: userContext,
-        topK: 5,
-        maxTokens: 2000,
-      });
-    } catch (retrievalErr) {
-      console.error("Nova curriculum retrieval error:", retrievalErr);
-      retrievalResult = null;
+
+    // GATING RULE:
+    // Only invoke curriculum retrieval when the question specifically requires
+    // course, lesson, or resource grounding.
+    // General knowledge questions ("what is AI", "what is recursion", etc.)
+    // MUST NOT retrieve curriculum or force grounding into an active lesson.
+    const shouldInvokeRetrieval =
+      classification.intent === "LESSON" ||
+      classification.intent === "COURSE" ||
+      classification.intent === "RESOURCE";
+
+    if (shouldInvokeRetrieval) {
+      try {
+        let targetCourseId = resolvedLessonContext?.courseId;
+        let targetLessonId: string | undefined = undefined;
+
+        if (classification.intent === "LESSON") {
+          targetLessonId = resolvedLessonContext?.lessonId;
+        } else if (classification.targetCourseSlug) {
+          // Explicit cross-course scoping by name
+          const targetCourse = await db.course.findUnique({
+            where: { slug: classification.targetCourseSlug },
+            select: { id: true },
+          });
+          if (targetCourse) targetCourseId = targetCourse.id;
+        }
+
+        retrievalResult = await searchCurriculum(message.trim(), {
+          courseId: targetCourseId,
+          lessonId: targetLessonId,
+          user: userContext,
+          topK: 5,
+          maxTokens: 2000,
+        });
+
+        // Step 9: Safe Relevance Gate
+        // Filter out low-relevance results to avoid hallucinating course grounding on vague queries
+        if (retrievalResult && retrievalResult.results.length > 0) {
+          const relevantChunks = retrievalResult.results.filter(
+            (c) => c.keywordScore > 0 || c.semanticScore >= 0.50
+          );
+          if (relevantChunks.length > 0) {
+            retrievalResult.results = relevantChunks;
+          } else {
+            // Prefer NO RETRIEVAL over WRONG RETRIEVAL
+            retrievalResult = null;
+          }
+        }
+      } catch (retrievalErr) {
+        console.error("Nova curriculum retrieval error:", retrievalErr);
+        retrievalResult = null;
+      }
     }
 
-    // 4. Generate Assistant Response (With Prompt Safety & Grounding intact)
+    // 4. Generate Assistant Response (With User Memory & Curriculum Grounding intact)
+    // For GENERAL questions, active lesson is NOT passed so the model doesn't force grounding into it.
+    const effectiveLessonContext =
+      classification.intent === "LESSON" || classification.intent === "COURSE"
+        ? resolvedLessonContext
+        : undefined;
+
     const response = await generateAssistantResponse({
       message: message.trim(),
       history: resolvedHistory,
-      lessonContext: resolvedLessonContext,
+      lessonContext: effectiveLessonContext,
       retrievedChunks: retrievalResult?.results || [],
+      userMemories: activeUserMemories,
     });
 
     // 5. Persist Assistant Message if active conversation
@@ -212,6 +276,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 6. Asynchronous Memory Extraction in Background (Non-blocking)
+    if (auth && auth.user.memoryEnabled) {
+      extractUserMemories({
+        userId: auth.user.id,
+        conversationId: activeConversationId || undefined,
+        userMessage: message.trim(),
+        assistantReply: response.reply,
+      }).catch((extractErr) => {
+        console.warn("Background memory extraction error:", extractErr);
+      });
+    }
+
     return NextResponse.json(
       {
         conversationId: activeConversationId,
@@ -220,18 +296,19 @@ export async function POST(req: NextRequest) {
         referencedCourses: response.referencedCourses,
         isFallback: response.isFallback,
         modelUsed: response.modelUsed,
-        retrieval: retrievalResult
-          ? {
-              mode: retrievalResult.degradedMode || "HYBRID",
-              candidateCount: retrievalResult.totalCandidates,
-              sources: retrievalResult.results.map((r) => ({
-                courseTitle: r.courseTitle,
-                lessonTitle: r.lessonTitle,
-                sourceUrl: r.sourceUrl,
-                hybridScore: r.hybridScore,
-              })),
-            }
-          : undefined,
+        retrieval:
+          retrievalResult && retrievalResult.results.length > 0
+            ? {
+                mode: retrievalResult.degradedMode || "HYBRID",
+                candidateCount: retrievalResult.totalCandidates,
+                sources: retrievalResult.results.map((r) => ({
+                  courseTitle: r.courseTitle,
+                  lessonTitle: r.lessonTitle,
+                  sourceUrl: r.sourceUrl,
+                  hybridScore: r.hybridScore,
+                })),
+              }
+            : undefined,
       },
       {
         headers: {
