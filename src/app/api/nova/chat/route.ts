@@ -48,32 +48,35 @@ export async function POST(req: NextRequest) {
     let resolvedLessonContext: LessonContext | undefined = lessonContext;
     let activeUserMemories: Array<{ memoryType: any; key: string; value: string }> = [];
 
-    // 2. Persistent Conversation & Personal Memory for Authenticated Users
+    // 2. Persistent Conversation & Personal Memory for Authenticated Users (Parallelized)
     if (auth) {
-      // Retrieve learner's durable personal memory if enabled
-      if (auth.user.memoryEnabled) {
-        try {
-          activeUserMemories = await getUserMemories(auth.user.id, { limit: 5 });
-        } catch (memErr) {
-          console.warn("Could not retrieve user memories:", memErr);
-        }
-      }
+      const memoryPromise = auth.user.memoryEnabled
+        ? getUserMemories(auth.user.id, { limit: 5 }).catch((memErr) => {
+            console.warn("Could not retrieve user memories:", memErr);
+            return [];
+          })
+        : Promise.resolve([]);
+
+      const conversationPromise =
+        conversationId && typeof conversationId === "string"
+          ? db.aIConversation.findUnique({
+              where: { id: conversationId },
+              include: {
+                messages: {
+                  orderBy: { createdAt: "asc" },
+                  take: 8,
+                  select: { role: true, content: true },
+                },
+                course: { select: { id: true, title: true, slug: true, status: true, authorId: true } },
+                lesson: { select: { id: true, title: true, slug: true, textContent: true, contentType: true } },
+              },
+            })
+          : Promise.resolve(null);
+
+      const [memories, conversation] = await Promise.all([memoryPromise, conversationPromise]);
+      activeUserMemories = memories;
 
       if (conversationId && typeof conversationId === "string") {
-        // Continue existing conversation - STRICT OWNERSHIP VERIFICATION
-        const conversation = await db.aIConversation.findUnique({
-          where: { id: conversationId },
-          include: {
-            messages: {
-              orderBy: { createdAt: "asc" },
-              take: 8,
-              select: { role: true, content: true },
-            },
-            course: { select: { id: true, title: true, slug: true, status: true, authorId: true } },
-            lesson: { select: { id: true, title: true, slug: true, textContent: true, contentType: true } },
-          },
-        });
-
         if (!conversation || conversation.userId !== auth.user.id) {
           return NextResponse.json({ error: "Conversation not found." }, { status: 404 });
         }

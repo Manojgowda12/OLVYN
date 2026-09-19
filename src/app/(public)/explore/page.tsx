@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getPublishedCourses } from "@/modules/courses/course.service";
 import { db } from "@/lib/db";
 import { Search, Heart, Star, BookOpen, Clock, Filter } from "lucide-react";
@@ -153,10 +154,12 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
                 {/* Image plate */}
                 <div className="relative aspect-4/3 w-full rounded-xl overflow-hidden bg-slate-100 mb-3.5">
                   {course.thumbnailUrl ? (
-                    <img
+                    <Image
                       src={course.thumbnailUrl}
                       alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-slate-100">

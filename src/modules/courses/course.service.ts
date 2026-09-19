@@ -146,7 +146,7 @@ export async function getCourseBySlug(slug: string, userId?: string) {
   let courseProgress = null;
 
   if (userId) {
-    [enrollment, courseProgress] = await Promise.all([
+    const [enrollmentRecord, courseProgressRecord, lessonProgressRecords] = await Promise.all([
       db.enrollment.findUnique({
         where: {
           userId_courseId: {
@@ -163,16 +163,22 @@ export async function getCourseBySlug(slug: string, userId?: string) {
           },
         },
       }),
+      db.lessonProgress.findMany({
+        where: {
+          userId,
+          lesson: {
+            module: { courseId: course.id },
+          },
+        },
+        select: {
+          lessonId: true,
+          isCompleted: true,
+        },
+      }),
     ]);
 
-    const lessonProgressRecords = await db.lessonProgress.findMany({
-      where: {
-        userId,
-        lesson: {
-          module: { courseId: course.id },
-        },
-      },
-    });
+    enrollment = enrollmentRecord;
+    courseProgress = courseProgressRecord;
 
     lessonProgressRecords.forEach((lp) => {
       progress[lp.lessonId] = lp.isCompleted;

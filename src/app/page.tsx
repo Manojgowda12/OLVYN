@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
@@ -61,41 +62,34 @@ type UserEnrollmentWithCourse = Prisma.EnrollmentGetPayload<{
 }>;
 
 export default async function HomePage() {
-  const session = await getSession();
-
-  // 1. Fetch featured published courses from database (bounded query)
-  let courses: HomePageCourse[] = [];
-  try {
-    courses = await db.course.findMany({
-      where: { status: "PUBLISHED" },
-      include: {
-        category: true,
-        author: { select: { name: true, avatarUrl: true } },
-        modules: {
-          include: {
-            lessons: { select: { id: true, durationMinutes: true } },
+  // 1. Concurrently fetch session, featured courses, and categories in parallel
+  const [session, courses, categories] = await Promise.all([
+    getSession().catch(() => null),
+    db.course
+      .findMany({
+        where: { status: "PUBLISHED" },
+        include: {
+          category: true,
+          author: { select: { name: true, avatarUrl: true } },
+          modules: {
+            include: {
+              lessons: { select: { id: true, durationMinutes: true } },
+            },
           },
         },
-      },
-      take: 6,
-      orderBy: { createdAt: "desc" },
-    });
-  } catch {
-    courses = [];
-  }
-
-  // 2. Fetch categories with published course counts
-  let categories: HomePageCategory[] = [];
-  try {
-    categories = await db.category.findMany({
-      include: {
-        _count: { select: { courses: { where: { status: "PUBLISHED" } } } },
-      },
-      orderBy: { name: "asc" },
-    });
-  } catch {
-    categories = [];
-  }
+        take: 6,
+        orderBy: { createdAt: "desc" },
+      })
+      .catch(() => [] as HomePageCourse[]),
+    db.category
+      .findMany({
+        include: {
+          _count: { select: { courses: { where: { status: "PUBLISHED" } } } },
+        },
+        orderBy: { name: "asc" },
+      })
+      .catch(() => [] as HomePageCategory[]),
+  ]);
 
   // 3. For authenticated users, fetch personal enrollments and progress (strictly scoped to session.userId)
   let userEnrollments: UserEnrollmentWithCourse[] = [];
@@ -484,10 +478,12 @@ export default async function HomePage() {
                       {/* Thumbnail plate */}
                       <div className="relative aspect-16/10 w-full rounded-2xl overflow-hidden bg-slate-100 mb-4">
                         {course.thumbnailUrl ? (
-                          <img
+                          <Image
                             src={course.thumbnailUrl}
                             alt={course.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-slate-100">
