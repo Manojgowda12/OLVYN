@@ -6,6 +6,11 @@ import { Footer } from "@/components/footer";
 export const metadata: Metadata = {
   title: "OpenLearner AI — Open Learning Platform",
   description: "Discover, learn, and master courses with AI-powered personalized tutoring and progress tracking.",
+  icons: {
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({

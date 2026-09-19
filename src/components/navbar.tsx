@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getSession } from "@/lib/auth";
-import { BookOpen, Sparkles, PenTool, Globe, Menu, User, ShieldAlert, LogOut, LayoutDashboard } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 import { NavLinks } from "./nav-links";
 
@@ -10,10 +11,17 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       <div className="max-w-7xl mx-auto h-20 px-6 lg:px-12 flex items-center justify-between">
-        {/* Brand Wordmark with vibrant badge dot */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-[#d2f835] shadow-xs group-hover:rotate-6 transition-transform">
-            <BookOpen className="w-5 h-5 text-[#d2f835]" />
+        {/* Brand Logo + Wordmark */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl bg-[#050812] flex-shrink-0 overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-200">
+            <Image
+              src="/logo.jpg"
+              alt="OpenLearnerAI"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
           <span className="font-extrabold text-[22px] tracking-tight text-slate-900">
             OpenLearner<span className="text-[#d2f835] bg-slate-900 px-1 rounded-sm ml-0.5 text-sm font-black">AI</span>

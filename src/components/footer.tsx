@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Globe, Heart } from "lucide-react";
+import Image from "next/image";
+import { Globe } from "lucide-react";
 
 export function Footer() {
   return (
@@ -8,9 +9,20 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-12 border-b border-white/10">
           {/* Brand Col */}
           <div className="space-y-4">
-            <span className="font-black text-xl text-white tracking-tight flex items-center">
+          <Link href="/" className="flex items-center gap-2.5 mb-1 group">
+            <div className="w-9 h-9 rounded-xl bg-[#050812] flex-shrink-0 overflow-hidden ring-1 ring-white/10 group-hover:ring-white/20 transition-all duration-200">
+              <Image
+                src="/logo.jpg"
+                alt="OpenLearnerAI"
+                width={36}
+                height={36}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="font-black text-xl text-white tracking-tight">
               OpenLearner<span className="text-[#d2f835] ml-0.5">.ai</span>
             </span>
+          </Link>
             <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
               Learn everything you want and need. Free open courses with transparent syllabi, progress tracking, and Nova AI tutor.
             </p>
