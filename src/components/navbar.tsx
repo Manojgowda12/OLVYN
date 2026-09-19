@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { BookOpen, Sparkles, PenTool, Globe, Menu, User, ShieldAlert, LogOut, LayoutDashboard } from "lucide-react";
 
+import { NavLinks } from "./nav-links";
+
 export async function Navbar() {
   const session = await getSession();
 
@@ -18,29 +20,8 @@ export async function Navbar() {
           </span>
         </Link>
 
-        {/* Center Links */}
-        <nav className="hidden md:flex items-center gap-8 text-[15px] font-semibold text-slate-700">
-          <Link href="/" className="hover:text-slate-900 transition-colors">
-            Home
-          </Link>
-          <Link href="/explore" className="hover:text-slate-900 transition-colors">
-            Courses
-          </Link>
-          <Link href="/#categories" className="hover:text-slate-900 transition-colors">
-            Categories
-          </Link>
-          <Link href="/nova" className="flex items-center gap-1.5 hover:text-slate-900 transition-colors">
-            <Sparkles className="w-3.5 h-3.5 text-slate-900" />
-            <span>Nova AI</span>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-[#d2f835] text-slate-900 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 animate-pulse"></span>
-              Live
-            </span>
-          </Link>
-          <Link href="/contributor" className="hover:text-slate-900 transition-colors">
-            Studio
-          </Link>
-        </nav>
+        {/* Center & Mobile Navigation Links with Active Detection */}
+        <NavLinks session={session} />
 
         {/* Right Action Pill */}
         <div className="flex items-center gap-3">
