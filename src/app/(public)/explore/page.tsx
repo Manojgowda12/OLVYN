@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getPublishedCourses } from "@/modules/courses/course.service";
-import { db } from "@/lib/db";
+import { getPublishedCourses, getCachedCategories } from "@/modules/courses/course.service";
 import { Search, Heart, Star, BookOpen, Clock, Filter } from "lucide-react";
 
 interface ExplorePageProps {
@@ -30,13 +29,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
       page,
       limit: 12,
     }),
-    db.category.findMany({
-      include: {
-        _count: {
-          select: { courses: { where: { status: "PUBLISHED" } } },
-        },
-      },
-    }),
+    getCachedCategories(),
   ]);
 
   return (

@@ -36,6 +36,7 @@ export function NavLinks({ session }: NavLinksProps) {
       <nav className="hidden md:flex items-center gap-2 lg:gap-3 text-[14px] font-semibold text-slate-700" aria-label="Main Navigation">
         <Link
           href="/"
+          prefetch={true}
           className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
             isHomeActive
               ? "bg-slate-900 text-white shadow-xs font-bold"
@@ -48,6 +49,7 @@ export function NavLinks({ session }: NavLinksProps) {
 
         <Link
           href="/explore"
+          prefetch={true}
           className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
             isCoursesActive
               ? "bg-slate-900 text-white shadow-xs font-bold"
@@ -67,6 +69,7 @@ export function NavLinks({ session }: NavLinksProps) {
 
         <Link
           href="/nova"
+          prefetch={true}
           className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
             isNovaActive
               ? "bg-slate-900 text-white shadow-xs font-bold"
@@ -86,6 +89,7 @@ export function NavLinks({ session }: NavLinksProps) {
         {session?.role === "ADMIN" ? (
           <Link
             href="/admin"
+            prefetch={true}
             className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
               isAdminActive
                 ? "bg-slate-900 text-white shadow-xs font-bold"
@@ -99,6 +103,7 @@ export function NavLinks({ session }: NavLinksProps) {
         ) : (
           <Link
             href="/contributor"
+            prefetch={true}
             className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
               isStudioActive
                 ? "bg-slate-900 text-white shadow-xs font-bold"
@@ -129,6 +134,7 @@ export function NavLinks({ session }: NavLinksProps) {
         <div className="absolute top-20 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-xl py-5 px-6 md:hidden flex flex-col gap-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <Link
             href="/"
+            prefetch={true}
             onClick={closeMobileMenu}
             className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
               isHomeActive
@@ -142,6 +148,7 @@ export function NavLinks({ session }: NavLinksProps) {
 
           <Link
             href="/explore"
+            prefetch={true}
             onClick={closeMobileMenu}
             className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
               isCoursesActive
@@ -163,6 +170,7 @@ export function NavLinks({ session }: NavLinksProps) {
 
           <Link
             href="/nova"
+            prefetch={true}
             onClick={closeMobileMenu}
             className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
               isNovaActive
@@ -182,6 +190,7 @@ export function NavLinks({ session }: NavLinksProps) {
           {session?.role === "ADMIN" ? (
             <Link
               href="/admin"
+              prefetch={true}
               onClick={closeMobileMenu}
               className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
                 isAdminActive
@@ -197,6 +206,7 @@ export function NavLinks({ session }: NavLinksProps) {
           ) : (
             <Link
               href="/contributor"
+              prefetch={true}
               onClick={closeMobileMenu}
               className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
                 isStudioActive
@@ -214,6 +224,7 @@ export function NavLinks({ session }: NavLinksProps) {
           {session && (
             <Link
               href={session.role === "ADMIN" ? "/admin" : session.role === "CONTRIBUTOR" ? "/contributor" : "/dashboard"}
+              prefetch={true}
               onClick={closeMobileMenu}
               className="mt-2 pt-3 border-t border-slate-100 flex items-center justify-between px-4 py-2 text-xs font-bold text-slate-600"
             >

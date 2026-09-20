@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { unstable_cache } from "next/cache";
 
 export interface CourseFilterParams {
   query?: string;
@@ -9,7 +10,26 @@ export interface CourseFilterParams {
   limit?: number;
 }
 
-export async function getPublishedCourses(params: CourseFilterParams = {}) {
+/**
+ * Cached taxonomy categories with published course counts.
+ * Revalidates every 60s or on demand via 'categories' / 'courses' tags.
+ */
+export const getCachedCategories = unstable_cache(
+  async () => {
+    return db.category.findMany({
+      include: {
+        _count: {
+          select: { courses: { where: { status: "PUBLISHED" } } },
+        },
+      },
+      orderBy: { name: "asc" },
+    });
+  },
+  ["categories-with-counts"],
+  { revalidate: 60, tags: ["categories", "courses"] }
+);
+
+async function fetchPublishedCourses(params: CourseFilterParams = {}) {
   const { query, category, difficulty, page = 1, limit = 12 } = params;
   const skip = (page - 1) * limit;
 
@@ -113,34 +133,70 @@ export async function getPublishedCourses(params: CourseFilterParams = {}) {
   };
 }
 
-export async function getCourseBySlug(slug: string, userId?: string) {
-  const course = await db.course.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-      author: {
-        select: { id: true, name: true, bio: true, avatarUrl: true },
-      },
-      tags: {
-        include: { tag: true },
-      },
-      modules: {
-        orderBy: { orderIndex: "asc" },
+const getCachedDefaultCourses = unstable_cache(
+  async () => {
+    return fetchPublishedCourses({ page: 1, limit: 12 });
+  },
+  ["default-published-courses-p1"],
+  { revalidate: 60, tags: ["courses"] }
+);
+
+export async function getPublishedCourses(params: CourseFilterParams = {}) {
+  const isDefault =
+    (!params.query || params.query.trim().length === 0) &&
+    (!params.category || params.category === "all") &&
+    (!params.difficulty || params.difficulty === "all") &&
+    (!params.page || params.page === 1) &&
+    (!params.limit || params.limit === 12);
+
+  if (isDefault) {
+    return getCachedDefaultCourses();
+  }
+
+  return fetchPublishedCourses(params);
+}
+
+const getCachedBaseCourse = (slug: string) =>
+  unstable_cache(
+    async () => {
+      const course = await db.course.findUnique({
+        where: { slug },
         include: {
-          lessons: {
+          category: true,
+          author: {
+            select: { id: true, name: true, bio: true, avatarUrl: true },
+          },
+          tags: {
+            include: { tag: true },
+          },
+          modules: {
             orderBy: { orderIndex: "asc" },
             include: {
-              resources: true,
+              lessons: {
+                orderBy: { orderIndex: "asc" },
+              },
             },
           },
         },
-      },
+      });
+
+      // Strict Course Visibility Guard: only PUBLISHED courses can ever enter the public cache
+      if (!course || course.status !== "PUBLISHED") {
+        return null;
+      }
+
+      return course;
     },
-  });
+    ["base-course", slug],
+    { revalidate: 60, tags: ["courses", `course-${slug}`] }
+  )();
+
+export async function getCourseBySlug(slug: string, userId?: string) {
+  const course = await getCachedBaseCourse(slug);
 
   if (!course) return null;
 
-  // If user is logged in, check enrollment and lesson progress
+  // If user is logged in, check enrollment and lesson progress concurrently
   let enrollment = null;
   let progress: Record<string, boolean> = {};
   let courseProgress = null;

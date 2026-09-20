@@ -12,7 +12,7 @@ export async function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       <div className="max-w-7xl mx-auto h-20 px-6 lg:px-12 flex items-center justify-between">
         {/* Brand Logo + Wordmark */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" prefetch={true} className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-[#050812] flex-shrink-0 overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-200">
             <Image
               src="/logo.jpg"
@@ -37,6 +37,7 @@ export async function Navbar() {
             <div className="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded-full bg-white border border-slate-200 shadow-xs">
               <Link
                 href={session.role === "ADMIN" ? "/admin" : session.role === "CONTRIBUTOR" ? "/contributor" : "/dashboard"}
+                prefetch={true}
                 className="flex items-center gap-2 group"
               >
                 <div className="w-8 h-8 rounded-full bg-[#121417] text-[#d2f835] flex items-center justify-center text-xs font-black uppercase shadow-xs">

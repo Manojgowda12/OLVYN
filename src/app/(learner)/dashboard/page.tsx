@@ -13,31 +13,32 @@ export default async function LearnerDashboard() {
     redirect("/login?redirect=/dashboard");
   }
 
-  // Fetch enrollments with course details and user progress
-  const enrollments = await db.enrollment.findMany({
-    where: { userId: session.userId },
-    include: {
-      course: {
-        include: {
-          category: true,
-          modules: {
-            orderBy: { orderIndex: "asc" },
-            include: {
-              lessons: {
-                orderBy: { orderIndex: "asc" },
-                select: { id: true, slug: true },
+  // Fetch enrollments with course details and user progress concurrently
+  const [enrollments, progressRecords] = await Promise.all([
+    db.enrollment.findMany({
+      where: { userId: session.userId },
+      include: {
+        course: {
+          include: {
+            category: true,
+            modules: {
+              orderBy: { orderIndex: "asc" },
+              include: {
+                lessons: {
+                  orderBy: { orderIndex: "asc" },
+                  select: { id: true, slug: true },
+                },
               },
             },
           },
         },
       },
-    },
-    orderBy: { enrolledAt: "desc" },
-  });
-
-  const progressRecords = await db.courseProgress.findMany({
-    where: { userId: session.userId },
-  });
+      orderBy: { enrolledAt: "desc" },
+    }),
+    db.courseProgress.findMany({
+      where: { userId: session.userId },
+    }),
+  ]);
 
   const progressMap = new Map(progressRecords.map((p) => [p.courseId, p]));
 

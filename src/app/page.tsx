@@ -61,8 +61,10 @@ type UserEnrollmentWithCourse = Prisma.EnrollmentGetPayload<{
   };
 }>;
 
+import { getCachedCategories } from "@/modules/courses/course.service";
+
 export default async function HomePage() {
-  // 1. Concurrently fetch session, featured courses, and categories in parallel
+  // 1. Concurrently fetch session, featured courses, and cached categories in parallel
   const [session, courses, categories] = await Promise.all([
     getSession().catch(() => null),
     db.course
@@ -81,60 +83,49 @@ export default async function HomePage() {
         orderBy: { createdAt: "desc" },
       })
       .catch(() => [] as HomePageCourse[]),
-    db.category
-      .findMany({
-        include: {
-          _count: { select: { courses: { where: { status: "PUBLISHED" } } } },
-        },
-        orderBy: { name: "asc" },
-      })
-      .catch(() => [] as HomePageCategory[]),
+    getCachedCategories().catch(() => [] as HomePageCategory[]),
   ]);
 
-  // 3. For authenticated users, fetch personal enrollments and progress (strictly scoped to session.userId)
+  // 2. For authenticated users, concurrently fetch personal enrollments and progress in parallel
   let userEnrollments: UserEnrollmentWithCourse[] = [];
   const progressMap = new Map<string, { percentage: number; completedLessons: number; isCompleted: boolean }>();
 
   if (session?.userId) {
     try {
-      userEnrollments = await db.enrollment.findMany({
-        where: { userId: session.userId },
-        take: 3,
-        orderBy: { lastAccessedAt: "desc" },
-        include: {
-          course: {
-            include: {
-              category: true,
-              modules: {
-                orderBy: { orderIndex: "asc" },
-                include: {
-                  lessons: {
-                    orderBy: { orderIndex: "asc" },
-                    select: { id: true, slug: true, title: true },
+      const [enrollments, progressRecords] = await Promise.all([
+        db.enrollment.findMany({
+          where: { userId: session.userId },
+          take: 3,
+          orderBy: { lastAccessedAt: "desc" },
+          include: {
+            course: {
+              include: {
+                category: true,
+                modules: {
+                  orderBy: { orderIndex: "asc" },
+                  include: {
+                    lessons: {
+                      orderBy: { orderIndex: "asc" },
+                      select: { id: true, slug: true, title: true },
+                    },
                   },
                 },
               },
             },
           },
-        },
-      });
+        }),
+        db.courseProgress.findMany({
+          where: { userId: session.userId },
+        }),
+      ]);
 
-      if (userEnrollments.length > 0) {
-        const courseIds = userEnrollments.map((e) => e.courseId);
-        const progressRecords = await db.courseProgress.findMany({
-          where: {
-            userId: session.userId,
-            courseId: { in: courseIds },
-          },
+      userEnrollments = enrollments;
+      for (const prog of progressRecords) {
+        progressMap.set(prog.courseId, {
+          percentage: Math.round(prog.percentage),
+          completedLessons: prog.completedLessons,
+          isCompleted: prog.isCompleted,
         });
-
-        for (const prog of progressRecords) {
-          progressMap.set(prog.courseId, {
-            percentage: Math.round(prog.percentage),
-            completedLessons: prog.completedLessons,
-            isCompleted: prog.isCompleted,
-          });
-        }
       }
     } catch {
       userEnrollments = [];

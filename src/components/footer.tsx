@@ -32,10 +32,10 @@ export function Footer() {
           <div>
             <h4 className="text-xs font-black uppercase tracking-wider text-[#d2f835] mb-4">Navigation</h4>
             <ul className="space-y-2.5 text-xs text-slate-300 font-semibold">
-              <li><Link href="/" className="hover:text-[#d2f835] transition-colors">Home</Link></li>
-              <li><Link href="/explore" className="hover:text-[#d2f835] transition-colors">Course Catalog</Link></li>
+              <li><Link href="/" prefetch={true} className="hover:text-[#d2f835] transition-colors">Home</Link></li>
+              <li><Link href="/explore" prefetch={true} className="hover:text-[#d2f835] transition-colors">Course Catalog</Link></li>
               <li><Link href="/#categories" className="hover:text-[#d2f835] transition-colors">Categories</Link></li>
-              <li><Link href="/#nova" className="hover:text-[#d2f835] transition-colors">Nova AI Assistant</Link></li>
+              <li><Link href="/nova" prefetch={true} className="hover:text-[#d2f835] transition-colors">Nova AI Assistant</Link></li>
             </ul>
           </div>
 
@@ -43,9 +43,9 @@ export function Footer() {
           <div>
             <h4 className="text-xs font-black uppercase tracking-wider text-[#d2f835] mb-4">Studio & Authors</h4>
             <ul className="space-y-2.5 text-xs text-slate-300 font-semibold">
-              <li><Link href="/contributor" className="hover:text-[#d2f835] transition-colors">Creator Studio</Link></li>
+              <li><Link href="/contributor" prefetch={true} className="hover:text-[#d2f835] transition-colors">Creator Studio</Link></li>
               <li><Link href="/contributor/courses/new" className="hover:text-[#d2f835] transition-colors">Create Course Draft</Link></li>
-              <li><Link href="/admin" className="hover:text-[#d2f835] transition-colors">Editorial Review</Link></li>
+              <li><Link href="/admin" prefetch={true} className="hover:text-[#d2f835] transition-colors">Editorial Review</Link></li>
               <li><Link href="/register" className="hover:text-[#d2f835] transition-colors">Join Community</Link></li>
             </ul>
           </div>
