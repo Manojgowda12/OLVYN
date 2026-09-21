@@ -60,3 +60,49 @@ export const reviewSchema = z.object({
   message: "Feedback comments (at least 5 characters) are required when rejecting a course.",
   path: ["comments"],
 });
+
+// Update Module Schema
+export const updateModuleSchema = z.object({
+  title: z.string().min(3, "Module title must be at least 3 characters").max(100),
+  description: z.string().max(300).optional().or(z.literal("")),
+});
+
+// Update Lesson Schema
+export const updateLessonSchema = z.object({
+  title: z.string().min(3, "Lesson title must be at least 3 characters").max(100),
+  description: z.string().max(300).optional().or(z.literal("")),
+  contentType: z.enum(["TEXT", "VIDEO_URL", "EXTERNAL_LINK", "DOCUMENT_URL", "CODE_REPO"]).default("TEXT"),
+  textContent: z.string().optional().or(z.literal("")),
+  mediaUrl: z.string().url("Invalid media or resource URL").optional().or(z.literal("")),
+  durationMinutes: z.coerce.number().int().min(1).max(300).optional().nullable(),
+  isRequired: z.boolean().default(true),
+});
+
+// Curriculum Reorder Schema
+export const reorderSchema = z.object({
+  type: z.enum(["MODULES", "LESSONS"]),
+  moduleId: z.string().optional(),
+  orderedIds: z.array(z.string().min(1)).min(1, "orderedIds must contain at least one ID"),
+});
+
+// Resource Schema
+export const resourceSchema = z.object({
+  title: z.string().min(2, "Title must be at least 2 characters").max(100),
+  resourceType: z.enum(["EXTERNAL_LINK", "FILE", "PDF", "CODE_REPO"]).default("EXTERNAL_LINK"),
+  url: z.string().min(1, "URL is required").refine((val) => {
+    const trimmed = val.trim();
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      try {
+        const u = new URL(trimmed);
+        return ["http:", "https:"].includes(u.protocol);
+      } catch {
+        return false;
+      }
+    }
+    if (trimmed.startsWith("/")) return true;
+    if (trimmed.startsWith("data:application/pdf") || trimmed.startsWith("data:image/")) return true;
+    return false;
+  }, "Invalid or unsafe resource URL. Must use HTTP or HTTPS protocol."),
+  description: z.string().max(300).optional().or(z.literal("")),
+  isInternal: z.boolean().default(false),
+});

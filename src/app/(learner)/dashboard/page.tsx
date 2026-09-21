@@ -189,7 +189,7 @@ export default async function LearnerDashboard() {
                       </div>
 
                       <Link
-                        href={firstLesson ? `/learn/${course.slug}/${firstLesson.slug}` : `/courses/${course.slug}`}
+                        href={`/learn/${course.slug}`}
                         className={`w-full py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                           isDone
                             ? "bg-slate-800 hover:bg-slate-700 text-slate-200"
@@ -199,6 +199,7 @@ export default async function LearnerDashboard() {
                         {isDone ? "Review Course" : "Continue Learning"}
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
+
                     </div>
                   </div>
                 </div>

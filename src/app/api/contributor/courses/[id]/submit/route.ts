@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { verifyContributorCourseAccess } from "@/lib/contributor-guard";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
+  const { id: courseId } = await params;
 
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  // Verify authentication, ownership, and DRAFT/REJECTED status
+  const auth = await verifyContributorCourseAccess(courseId, { requireEditableStatus: true });
+  if (!auth.success) {
+    return auth.response;
   }
 
-  const { id: courseId } = await params;
 
   const course = await db.course.findUnique({
     where: { id: courseId },
@@ -29,10 +30,6 @@ export async function POST(
     return NextResponse.json({ error: "Course not found." }, { status: 404 });
   }
 
-  if (course.authorId !== session.userId && session.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden. You are not the author." }, { status: 403 });
-  }
-
   if (course.status === "PENDING_REVIEW") {
     return NextResponse.json({ error: "Course is already awaiting editorial review." }, { status: 400 });
   }
@@ -41,7 +38,7 @@ export async function POST(
     return NextResponse.json({ error: "Course is already published." }, { status: 400 });
   }
 
-  // Verification criteria
+  // Verification criteria: must have modules and lessons
   if (!course.modules || course.modules.length === 0) {
     return NextResponse.json(
       { error: "Course must have at least one module before submitting for review." },
@@ -57,13 +54,25 @@ export async function POST(
     );
   }
 
-  const updatedCourse = await db.course.update({
-    where: { id: courseId },
-    data: {
-      status: "PENDING_REVIEW",
-      rejectionReason: null, // Clear any prior rejection reason upon resubmission
-    },
-  });
+  const reviewAction = course.status === "REJECTED" ? "RESUBMITTED" : "SUBMITTED";
+
+  const [updatedCourse] = await db.$transaction([
+    db.course.update({
+      where: { id: courseId },
+      data: {
+        status: "PENDING_REVIEW",
+        rejectionReason: null, // Clear active rejection reason upon resubmission
+      },
+    }),
+    db.courseReview.create({
+      data: {
+        courseId,
+        reviewerId: auth.session.userId,
+        action: reviewAction,
+        comments: reviewAction === "RESUBMITTED" ? "Course revisions submitted for review." : "Course submitted for editorial review.",
+      },
+    }),
+  ]);
 
   return NextResponse.json({
     message: "Course submitted for editorial review successfully.",

@@ -1,31 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { verifyContributorCourseAccess } from "@/lib/contributor-guard";
 import { moduleSchema } from "@/lib/validations";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-
   const { id: courseId } = await params;
 
-  const course = await db.course.findUnique({
-    where: { id: courseId },
-  });
-
-  if (!course) {
-    return NextResponse.json({ error: "Course not found." }, { status: 404 });
+  // Verify authentication, ownership, and DRAFT/REJECTED status
+  const auth = await verifyContributorCourseAccess(courseId, { requireEditableStatus: true });
+  if (!auth.success) {
+    return auth.response;
   }
 
-  if (course.authorId !== session.userId && session.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
-  }
 
   try {
     const body = await req.json();
@@ -40,12 +29,31 @@ export async function POST(
 
     const { title, description, orderIndex } = result.data;
 
+    // Check if requested orderIndex already exists; if so, assign next highest orderIndex
+    let finalOrderIndex = orderIndex;
+    const existingWithIndex = await db.module.findUnique({
+      where: {
+        courseId_orderIndex: {
+          courseId,
+          orderIndex: finalOrderIndex,
+        },
+      },
+    });
+
+    if (existingWithIndex) {
+      const maxAgg = await db.module.aggregate({
+        where: { courseId },
+        _max: { orderIndex: true },
+      });
+      finalOrderIndex = (maxAgg._max.orderIndex || 0) + 1;
+    }
+
     const moduleItem = await db.module.create({
       data: {
         courseId,
         title,
         description: description || null,
-        orderIndex,
+        orderIndex: finalOrderIndex,
       },
     });
 

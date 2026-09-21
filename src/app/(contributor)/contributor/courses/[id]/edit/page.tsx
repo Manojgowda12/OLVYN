@@ -20,19 +20,31 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
 
   const { id } = await params;
 
-  const course = await db.course.findUnique({
-    where: { id },
-    include: {
-      modules: {
-        orderBy: { orderIndex: "asc" },
-        include: {
-          lessons: {
-            orderBy: { orderIndex: "asc" },
+  const [course, categories] = await Promise.all([
+    db.course.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        modules: {
+          orderBy: { orderIndex: "asc" },
+          include: {
+            lessons: {
+              orderBy: { orderIndex: "asc" },
+              include: {
+                resources: {
+                  orderBy: { createdAt: "asc" },
+                },
+              },
+            },
           },
         },
       },
-    },
-  });
+    }),
+    db.category.findMany({
+      select: { id: true, name: true, slug: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
 
   if (!course) {
     notFound();
@@ -45,7 +57,8 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-      <CourseEditor course={course} />
+      <CourseEditor course={course} categories={categories} />
     </div>
   );
+
 }

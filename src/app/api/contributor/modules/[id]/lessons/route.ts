@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { verifyContributorModuleAccess } from "@/lib/contributor-guard";
 import { lessonSchema } from "@/lib/validations";
 import { slugify } from "@/lib/utils";
 
@@ -8,26 +8,16 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-
   const { id: moduleId } = await params;
 
-  const moduleItem = await db.module.findUnique({
-    where: { id: moduleId },
-    include: { course: true },
-  });
-
-  if (!moduleItem) {
-    return NextResponse.json({ error: "Module not found." }, { status: 404 });
+  // Verify authentication, ownership, and DRAFT/REJECTED status through parent module
+  const auth = await verifyContributorModuleAccess(moduleId, { requireEditableStatus: true });
+  if (!auth.success) {
+    return auth.response;
   }
 
-  if (moduleItem.course.authorId !== session.userId && session.role !== "ADMIN") {
-    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
-  }
+
+  const moduleItem = auth.entity;
 
   try {
     const body = await req.json();
@@ -41,6 +31,24 @@ export async function POST(
     }
 
     const { title, description, contentType, textContent, mediaUrl, durationMinutes, orderIndex, isRequired } = result.data;
+
+    let finalOrderIndex = orderIndex;
+    const existingWithIndex = await db.lesson.findUnique({
+      where: {
+        moduleId_orderIndex: {
+          moduleId,
+          orderIndex: finalOrderIndex,
+        },
+      },
+    });
+
+    if (existingWithIndex) {
+      const maxAgg = await db.lesson.aggregate({
+        where: { moduleId },
+        _max: { orderIndex: true },
+      });
+      finalOrderIndex = (maxAgg._max.orderIndex || 0) + 1;
+    }
 
     const baseSlug = slugify(title);
     let uniqueSlug = baseSlug;
@@ -65,7 +73,7 @@ export async function POST(
         textContent: textContent || null,
         mediaUrl: mediaUrl || null,
         durationMinutes: durationMinutes || null,
-        orderIndex,
+        orderIndex: finalOrderIndex,
         isRequired,
       },
     });

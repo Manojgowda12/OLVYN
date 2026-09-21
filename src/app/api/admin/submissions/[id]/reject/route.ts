@@ -13,6 +13,7 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden. Admin privileges required." }, { status: 403 });
   }
 
+
   const { id: courseId } = await params;
 
   const course = await db.course.findUnique({

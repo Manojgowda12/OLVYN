@@ -11,6 +11,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized. Please sign in to create courses." }, { status: 401 });
   }
 
+  if (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden. Contributor access required." }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const result = courseSchema.safeParse(body);
@@ -23,6 +27,14 @@ export async function POST(req: NextRequest) {
     }
 
     const { title, shortSummary, description, difficulty, language, estimatedHours, thumbnailUrl, categoryId } = result.data;
+
+    if (categoryId) {
+      const categoryExists = await db.category.findUnique({ where: { id: categoryId } });
+      if (!categoryExists) {
+        return NextResponse.json({ error: "Selected category does not exist." }, { status: 400 });
+      }
+    }
+
 
     let baseSlug = slugify(title);
     let uniqueSlug = baseSlug;
