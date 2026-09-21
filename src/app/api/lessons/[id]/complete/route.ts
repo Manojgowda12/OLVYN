@@ -41,6 +41,29 @@ export async function POST(
   const course = lesson.module.course;
   const courseId = course.id;
 
+  // Course visibility security check: only PUBLISHED courses can have progress updated by learners
+  const isAuthorOrAdmin = session.role === "ADMIN" || course.authorId === session.userId;
+  if (course.status !== "PUBLISHED" && !isAuthorOrAdmin) {
+    return NextResponse.json({ error: "Course is not published." }, { status: 404 });
+  }
+
+  // Ensure enrollment exists
+  await db.enrollment.upsert({
+    where: {
+      userId_courseId: {
+        userId: session.userId,
+        courseId,
+      },
+    },
+    create: {
+      userId: session.userId,
+      courseId,
+    },
+    update: {
+      lastAccessedAt: new Date(),
+    },
+  });
+
   // Toggle completion
   const existingProgress = await db.lessonProgress.findUnique({
     where: {
@@ -86,7 +109,8 @@ export async function POST(
     },
   });
 
-  const percentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const rawPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const percentage = Math.min(100, Math.max(0, rawPercentage));
   const isCourseCompleted = percentage >= 100;
 
   const updatedCourseProgress = await db.courseProgress.upsert({

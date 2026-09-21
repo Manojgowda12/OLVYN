@@ -22,8 +22,12 @@ export async function POST(
     where: { id: courseId },
     include: {
       modules: {
+        orderBy: { orderIndex: "asc" },
         include: {
-          lessons: { select: { id: true } },
+          lessons: {
+            orderBy: { orderIndex: "asc" },
+            select: { id: true, slug: true },
+          },
         },
       },
     },
@@ -70,9 +74,9 @@ export async function POST(
   }
 
   // Redirect to first lesson or course page
-  const firstLesson = course.modules[0]?.lessons[0];
+  const firstLesson = course.modules.find((m) => m.lessons.length > 0)?.lessons[0];
   const targetUrl = firstLesson
-    ? `/learn/${course.slug}/${course.modules[0].lessons[0].id}`
+    ? `/learn/${course.slug}/${firstLesson.slug}`
     : `/courses/${course.slug}`;
 
   return NextResponse.redirect(new URL(targetUrl, req.url), 303);

@@ -20,6 +20,7 @@ import {
   HelpCircle,
   Code
 } from "lucide-react";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 
 interface LessonItem {
   id: string;
@@ -97,13 +98,20 @@ export function PlayerView({
 
   const isCurrentCompleted = !!progress[currentLesson.id];
 
-  // Flatten all lessons to determine next & previous
+  // Flatten all lessons deterministically: Module order -> Lesson order
   const allLessons = course.modules.flatMap((m) =>
     m.lessons.map((l) => ({ ...l, moduleTitle: m.title }))
   );
   const currentIndex = allLessons.findIndex((l) => l.id === currentLesson.id);
   const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
   const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+  const isFinalLesson = currentIndex === allLessons.length - 1;
+
+  const completedCount = allLessons.filter((l) => progress[l.id]).length;
+  const totalLessonsCount = allLessons.length;
+  const isCourseFullyCompleted =
+    (courseProgress?.isCompleted ?? false) ||
+    (totalLessonsCount > 0 && completedCount === totalLessonsCount);
 
   // Toggle completion
   const handleToggleComplete = async () => {
@@ -200,15 +208,19 @@ export function PlayerView({
 
         <div className="flex items-center gap-3">
           {/* Progress Indicator */}
-          <div className="hidden md:flex items-center gap-2">
-            <span className="text-xs text-slate-400">Progress:</span>
-            <div className="w-24 h-2 rounded-full bg-slate-950 overflow-hidden">
+          <div className="hidden md:flex items-center gap-3">
+            <span className="text-xs text-slate-400">
+              Lesson {currentIndex + 1} of {totalLessonsCount} • <span className="text-slate-300 font-semibold">{courseProgress?.completedLessons ?? completedCount}/{totalLessonsCount}</span> completed
+            </span>
+            <div className="w-24 h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
               <div
-                className="h-full bg-blue-500 transition-all duration-300"
+                className={`h-full transition-all duration-300 ${
+                  isCourseFullyCompleted ? "bg-emerald-500" : "bg-blue-500"
+                }`}
                 style={{ width: `${courseProgress?.percentage || 0}%` }}
               />
             </div>
-            <span className="text-xs font-mono text-blue-400 font-semibold">
+            <span className={`text-xs font-mono font-semibold ${isCourseFullyCompleted ? "text-emerald-400" : "text-blue-400"}`}>
               {courseProgress?.percentage || 0}%
             </span>
           </div>
@@ -348,9 +360,7 @@ export function PlayerView({
             {/* Lesson Text / Markdown Content */}
             {currentLesson.textContent ? (
               <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/60 border border-slate-800/90 shadow-sm">
-                <div className="prose-dark whitespace-pre-line text-sm sm:text-base leading-relaxed">
-                  {currentLesson.textContent}
-                </div>
+                <MarkdownRenderer content={currentLesson.textContent} theme="dark" />
               </div>
             ) : (
               <div className="p-8 rounded-2xl bg-slate-900/40 border border-slate-800 text-center text-slate-400 text-sm">
@@ -377,6 +387,36 @@ export function PlayerView({
                       <ExternalLink className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-400 shrink-0 ml-2" />
                     </a>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Celebratory Completion Banner */}
+            {isCourseFullyCompleted && (
+              <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 shadow-lg text-center space-y-3.5">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-extrabold text-white tracking-tight">Course Completed! 🎉</h3>
+                  <p className="text-xs text-slate-300 mt-1 max-w-md mx-auto leading-relaxed">
+                    Outstanding job! You have successfully completed all {totalLessonsCount} lessons in <span className="font-semibold text-white">{course.title}</span>.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <Link
+                    href={`/courses/${course.slug}`}
+                    className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+                  >
+                    Review Course Overview
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-colors flex items-center gap-1.5 shadow-md shadow-emerald-900/30"
+                  >
+                    <span>Go to Dashboard</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
             )}
@@ -430,10 +470,10 @@ export function PlayerView({
                 </Link>
               ) : (
                 <Link
-                  href="/dashboard"
+                  href={`/courses/${course.slug}`}
                   className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
-                  Course Completed! Return to Dashboard <ArrowRight className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4" /> Course Complete
                 </Link>
               )}
             </div>

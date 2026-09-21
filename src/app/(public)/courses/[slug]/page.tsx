@@ -21,7 +21,14 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
     notFound();
   }
 
-  const firstLesson = course.modules[0]?.lessons[0];
+  const allLessons = course.modules.flatMap((m) => m.lessons);
+  const firstLesson = allLessons[0];
+  const completedCount = allLessons.filter((l) => course.progress[l.id]).length;
+  const totalLessons = allLessons.length;
+  const isAllCompleted = totalLessons > 0 && completedCount === totalLessons;
+  const isStarted = completedCount > 0;
+  const firstIncompleteLesson = allLessons.find((l) => !course.progress[l.id]) || firstLesson;
+  const progressPercentage = course.courseProgress?.percentage ?? (totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full text-slate-900">
@@ -224,28 +231,52 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
             {/* Action CTA */}
             {course.isEnrolled ? (
               <div className="space-y-3">
-                {course.courseProgress && (
-                  <div>
-                    <div className="flex items-center justify-between text-xs mb-1.5 font-semibold">
-                      <span className="text-slate-600">Your Progress</span>
-                      <span className="text-rose-600">{course.courseProgress.percentage}%</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-rose-500 to-rose-600 rounded-full transition-all duration-500"
-                        style={{ width: `${course.courseProgress.percentage}%` }}
-                      />
-                    </div>
+                {/* Progress bar */}
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5 font-semibold">
+                    <span className="text-slate-600">Your Progress</span>
+                    <span className={isAllCompleted ? "text-emerald-600 font-bold" : "text-rose-600"}>
+                      {progressPercentage}% ({completedCount}/{totalLessons} completed)
+                    </span>
                   </div>
-                )}
+                  <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        isAllCompleted
+                          ? "bg-emerald-500"
+                          : "bg-gradient-to-r from-rose-500 to-rose-600"
+                      }`}
+                      style={{ width: `${progressPercentage}%` }}
+                    />
+                  </div>
+                </div>
 
-                <Link
-                  href={firstLesson ? `/learn/${course.slug}/${firstLesson.slug}` : `/dashboard`}
-                  className="w-full py-3.5 px-5 rounded-full bg-slate-900 hover:bg-black text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 group"
-                >
-                  <span>Continue Learning</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
+                {isAllCompleted ? (
+                  <Link
+                    href={firstLesson ? `/learn/${course.slug}/${firstLesson.slug}` : `/dashboard`}
+                    className="w-full py-3.5 px-5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 group"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <span>Review Course</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                ) : isStarted ? (
+                  <Link
+                    href={`/learn/${course.slug}/${firstIncompleteLesson.slug}`}
+                    className="w-full py-3.5 px-5 rounded-full bg-slate-900 hover:bg-black text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 group"
+                  >
+                    <span>Continue Learning</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                ) : (
+                  <Link
+                    href={firstLesson ? `/learn/${course.slug}/${firstLesson.slug}` : `/dashboard`}
+                    className="w-full py-3.5 px-5 rounded-full bg-slate-900 hover:bg-black text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 group"
+                  >
+                    <span>Start Learning</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                )}
               </div>
             ) : (
               <form action={`/api/courses/${course.id}/enroll`} method="POST" suppressHydrationWarning>
@@ -254,7 +285,7 @@ export default async function CourseDetailsPage({ params }: CourseDetailsPagePro
                   className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white font-semibold text-sm shadow-[0_4px_20px_rgba(244,63,94,0.3)] transition-all flex items-center justify-center gap-2 group"
                   suppressHydrationWarning
                 >
-                  <span>Enroll in Course (Free)</span>
+                  <span>Start Learning</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </form>

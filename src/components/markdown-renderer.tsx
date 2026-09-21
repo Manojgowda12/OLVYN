@@ -7,6 +7,7 @@ import { Check, Copy, Code2 } from "lucide-react";
 interface MarkdownRendererProps {
   content: string;
   isUser?: boolean;
+  theme?: "light" | "dark";
 }
 
 /**
@@ -22,8 +23,10 @@ interface MarkdownRendererProps {
  * - Safe links ([text](url)) with protocol validation
  * - Paragraphs
  */
-export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, isUser = false, theme = "light" }: MarkdownRendererProps) {
   if (!content) return null;
+
+  const isDark = theme === "dark" || isUser;
 
   // Split content by code blocks first
   const parts: React.ReactNode[] = [];
@@ -42,9 +45,9 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
         parts.push(
           <p
             key={`p-${blockIndex++}`}
-            className={`leading-relaxed my-1.5 ${isUser ? "text-white" : "text-slate-800"}`}
+            className={`leading-relaxed my-1.5 ${isUser ? "text-white" : isDark ? "text-slate-200" : "text-slate-800"}`}
           >
-            {renderInline(text, isUser)}
+            {renderInline(text, isUser, isDark)}
           </p>
         );
       }
@@ -65,8 +68,8 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
             className="list-decimal list-outside ml-5 my-2 space-y-1 text-xs sm:text-sm"
           >
             {items.map((item, idx) => (
-              <li key={idx} className={isUser ? "text-white" : "text-slate-800"}>
-                {renderInline(item.text, isUser)}
+              <li key={idx} className={isUser ? "text-white" : isDark ? "text-slate-200" : "text-slate-800"}>
+                {renderInline(item.text, isUser, isDark)}
               </li>
             ))}
           </ol>
@@ -78,8 +81,8 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
             className="list-disc list-outside ml-5 my-2 space-y-1 text-xs sm:text-sm"
           >
             {items.map((item, idx) => (
-              <li key={idx} className={isUser ? "text-white" : "text-slate-800"}>
-                {renderInline(item.text, isUser)}
+              <li key={idx} className={isUser ? "text-white" : isDark ? "text-slate-200" : "text-slate-800"}>
+                {renderInline(item.text, isUser, isDark)}
               </li>
             ))}
           </ul>
@@ -129,9 +132,9 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
       parts.push(
         <h4
           key={`h4-${blockIndex++}`}
-          className={`text-xs font-bold mt-2.5 mb-1 ${isUser ? "text-[#d2f835]" : "text-slate-900"}`}
+          className={`text-xs font-bold mt-2.5 mb-1 ${isUser ? "text-[#d2f835]" : isDark ? "text-slate-200" : "text-slate-900"}`}
         >
-          {renderInline(line.slice(5), isUser)}
+          {renderInline(line.slice(5), isUser, isDark)}
         </h4>
       );
       continue;
@@ -143,9 +146,9 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
       parts.push(
         <h3
           key={`h3-${blockIndex++}`}
-          className={`text-sm sm:text-base font-bold mt-3 mb-1.5 ${isUser ? "text-[#d2f835]" : "text-slate-900"}`}
+          className={`text-sm sm:text-base font-bold mt-3 mb-1.5 ${isUser ? "text-[#d2f835]" : isDark ? "text-white" : "text-slate-900"}`}
         >
-          {renderInline(line.slice(4), isUser)}
+          {renderInline(line.slice(4), isUser, isDark)}
         </h3>
       );
       continue;
@@ -157,9 +160,9 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
       parts.push(
         <h2
           key={`h2-${blockIndex++}`}
-          className={`text-base sm:text-lg font-extrabold mt-3.5 mb-1.5 ${isUser ? "text-[#d2f835]" : "text-slate-900"}`}
+          className={`text-base sm:text-lg font-extrabold mt-3.5 mb-1.5 ${isUser ? "text-[#d2f835]" : isDark ? "text-white" : "text-slate-900"}`}
         >
-          {renderInline(line.slice(3), isUser)}
+          {renderInline(line.slice(3), isUser, isDark)}
         </h2>
       );
       continue;
@@ -171,9 +174,9 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
       parts.push(
         <h1
           key={`h1-${blockIndex++}`}
-          className={`text-lg sm:text-xl font-black mt-4 mb-2 ${isUser ? "text-[#d2f835]" : "text-slate-900"}`}
+          className={`text-lg sm:text-xl font-black mt-4 mb-2 ${isUser ? "text-[#d2f835]" : isDark ? "text-white" : "text-slate-900"}`}
         >
-          {renderInline(line.slice(2), isUser)}
+          {renderInline(line.slice(2), isUser, isDark)}
         </h1>
       );
       continue;
@@ -189,10 +192,12 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
           className={`border-l-3 pl-3 py-1 my-2 italic text-xs sm:text-sm rounded-r-md ${
             isUser
               ? "border-white/40 bg-white/5 text-slate-200"
+              : isDark
+              ? "border-slate-600 bg-slate-800/60 text-slate-300"
               : "border-slate-300 bg-slate-100/70 text-slate-700"
           }`}
         >
-          {renderInline(line.slice(2), isUser)}
+          {renderInline(line.slice(2), isUser, isDark)}
         </blockquote>
       );
       continue;
@@ -244,7 +249,7 @@ export function MarkdownRenderer({ content, isUser = false }: MarkdownRendererPr
 /**
  * Renders inline markdown tokens: bold, italic, inline code, and links.
  */
-function renderInline(text: string, isUser: boolean): React.ReactNode {
+function renderInline(text: string, isUser: boolean, isDark = false): React.ReactNode {
   // Tokenize string for code, links, bold, and italic
   // Regex to match:
   // 1. Inline code: `code`
@@ -272,7 +277,11 @@ function renderInline(text: string, isUser: boolean): React.ReactNode {
         <code
           key={`code-${match.index}`}
           className={`px-1.5 py-0.5 rounded font-mono text-[11px] font-semibold ${
-            isUser ? "bg-white/15 text-[#d2f835]" : "bg-slate-200/80 text-rose-700"
+            isUser
+              ? "bg-white/15 text-[#d2f835]"
+              : isDark
+              ? "bg-slate-800 text-rose-300 border border-slate-700"
+              : "bg-slate-200/80 text-rose-700"
           }`}
         >
           {codeContent}
@@ -301,6 +310,8 @@ function renderInline(text: string, isUser: boolean): React.ReactNode {
                 className={`font-semibold underline transition-colors ${
                   isUser
                     ? "text-[#d2f835] hover:text-white"
+                    : isDark
+                    ? "text-blue-400 hover:text-blue-300"
                     : "text-blue-600 hover:text-blue-800"
                 }`}
               >
@@ -317,6 +328,8 @@ function renderInline(text: string, isUser: boolean): React.ReactNode {
                 className={`font-semibold underline transition-colors ${
                   isUser
                     ? "text-[#d2f835] hover:text-white"
+                    : isDark
+                    ? "text-blue-400 hover:text-blue-300"
                     : "text-blue-600 hover:text-blue-800"
                 }`}
               >
@@ -336,7 +349,7 @@ function renderInline(text: string, isUser: boolean): React.ReactNode {
       nodes.push(
         <strong
           key={`b-${match.index}`}
-          className={`font-bold ${isUser ? "text-white" : "text-slate-900"}`}
+          className={`font-bold ${isUser ? "text-white" : isDark ? "text-white" : "text-slate-900"}`}
         >
           {token.slice(2, -2)}
         </strong>
