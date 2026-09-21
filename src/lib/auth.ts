@@ -14,6 +14,8 @@ import {
   clearLegacySession,
   hashPassword,
   verifyPassword,
+  getSessionCookieOptions,
+  SESSION_COOKIE_NAME,
   SessionPayload,
 } from "./auth-legacy";
 
@@ -23,6 +25,8 @@ export {
   requireRole,
   resolveOrCreateUser,
   createLegacySession,
+  getSessionCookieOptions,
+  SESSION_COOKIE_NAME,
   hashPassword,
   verifyPassword,
 };

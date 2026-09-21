@@ -29,6 +29,54 @@ export const getCachedCategories = unstable_cache(
   { revalidate: 60, tags: ["categories", "courses"] }
 );
 
+/**
+ * Canonical category alias resolution.
+ * Disambiguates shorthand terms (e.g. 'ai', 'ux', 'math', 'tech') without fuzzy substring collisions.
+ */
+export const CATEGORY_ALIASES: Record<string, string> = {
+  ai: "data-science-ai",
+  "data-science": "data-science-ai",
+  "data science": "data-science-ai",
+  "data-science-ai": "data-science-ai",
+  "data science & ai": "data-science-ai",
+  "machine-learning": "data-science-ai",
+  ml: "data-science-ai",
+  tech: "programming-technology",
+  programming: "programming-technology",
+  technology: "programming-technology",
+  coding: "programming-technology",
+  "web development": "programming-technology",
+  "web-development": "programming-technology",
+  "programming-technology": "programming-technology",
+  "programming & technology": "programming-technology",
+  design: "design-ux",
+  ux: "design-ux",
+  ui: "design-ux",
+  "ui/ux": "design-ux",
+  "ui-ux": "design-ux",
+  "design-ux": "design-ux",
+  "design & ux": "design-ux",
+  business: "business-finance",
+  finance: "business-finance",
+  "business-finance": "business-finance",
+  "business & finance": "business-finance",
+  math: "mathematics-science",
+  science: "mathematics-science",
+  mathematics: "mathematics-science",
+  "mathematics-science": "mathematics-science",
+  "mathematics & science": "mathematics-science",
+};
+
+export function resolveCategorySlug(param?: string): string | null {
+  if (!param || param === "all") return null;
+  const normalized = param.trim().toLowerCase();
+  return (
+    CATEGORY_ALIASES[normalized] ||
+    CATEGORY_ALIASES[normalized.replace(/\s+/g, "-")] ||
+    normalized
+  );
+}
+
 async function fetchPublishedCourses(params: CourseFilterParams = {}) {
   const { query, category, difficulty, page = 1, limit = 12 } = params;
   const skip = (page - 1) * limit;
@@ -38,8 +86,13 @@ async function fetchPublishedCourses(params: CourseFilterParams = {}) {
   };
 
   if (category && category !== "all") {
+    const resolvedSlug = resolveCategorySlug(category) || category.trim().toLowerCase();
     whereClause.category = {
-      slug: category,
+      OR: [
+        { slug: { equals: resolvedSlug, mode: "insensitive" } },
+        { slug: { equals: category.trim(), mode: "insensitive" } },
+        { name: { equals: category.trim(), mode: "insensitive" } },
+      ],
     };
   }
 

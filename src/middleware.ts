@@ -51,8 +51,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (isContributorPath && resolvedRole !== "CONTRIBUTOR" && resolvedRole !== "ADMIN") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  const isContributorCourseMutation = pathname.startsWith("/contributor/courses");
+  if (isContributorCourseMutation && resolvedRole !== "CONTRIBUTOR" && resolvedRole !== "ADMIN") {
+    return NextResponse.redirect(new URL("/contributor", request.url));
   }
 
   return supabaseResponse;

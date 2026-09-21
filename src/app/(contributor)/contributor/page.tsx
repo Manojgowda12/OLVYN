@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { ContributorOnboarding } from "./contributor-onboarding";
 import {
   PenTool,
   Plus,
@@ -24,8 +25,9 @@ export default async function ContributorDashboard() {
     redirect("/login?redirect=/contributor");
   }
 
+  // If authenticated user is a Learner, show the Creator Studio Onboarding screen
   if (session.role !== "CONTRIBUTOR" && session.role !== "ADMIN") {
-    redirect("/dashboard");
+    return <ContributorOnboarding userName={session.name} userEmail={session.email} />;
   }
 
   const courses = await db.course.findMany({

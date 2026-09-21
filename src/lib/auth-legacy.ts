@@ -25,6 +25,25 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
+export function getSessionCookieOptions() {
+  const appUrl = (typeof process !== "undefined" && process.env.NEXT_PUBLIC_APP_URL) || "";
+  const isExplicitLocalhost =
+    appUrl.includes("localhost") || appUrl.includes("127.0.0.1");
+
+  // In production, enforce Secure cookies UNLESS explicitly running on an unencrypted localhost/127.0.0.1 URL.
+  // In development/test (NODE_ENV !== "production"), secure is false so developers can test over plain HTTP.
+  const isSecure =
+    process.env.NODE_ENV === "production" ? !isExplicitLocalhost : false;
+
+  return {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: SESSION_DURATION,
+  };
+}
+
 export async function createSession(payload: SessionPayload): Promise<string> {
   const token = await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
@@ -34,13 +53,7 @@ export async function createSession(payload: SessionPayload): Promise<string> {
 
   try {
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_DURATION,
-    });
+    cookieStore.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions());
   } catch {
     // Outside request context
   }

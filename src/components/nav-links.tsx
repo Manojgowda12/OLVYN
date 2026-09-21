@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sparkles, Menu, X, BookOpen, Compass, Layers, Shield, PenTool } from "lucide-react";
+import { Sparkles, Menu, X, BookOpen, Shield, PenTool, LogOut, LayoutDashboard } from "lucide-react";
 
 interface SessionUser {
   userId: string;
@@ -21,12 +21,13 @@ export function NavLinks({ session }: NavLinksProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Active state determinations
+  // Deterministic active state determinations
   const isHomeActive = pathname === "/";
-  const isCoursesActive = pathname.startsWith("/explore") || pathname.startsWith("/courses");
-  const isNovaActive = pathname.startsWith("/nova");
+  const isExploreActive = pathname === "/explore" || pathname.startsWith("/explore?") || pathname.startsWith("/courses");
   const isStudioActive = pathname.startsWith("/contributor");
+  const isDashboardActive = pathname.startsWith("/dashboard");
   const isAdminActive = pathname.startsWith("/admin");
+  const isNovaActive = pathname.startsWith("/nova");
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
@@ -51,21 +52,58 @@ export function NavLinks({ session }: NavLinksProps) {
           href="/explore"
           prefetch={true}
           className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
-            isCoursesActive
+            isExploreActive
               ? "bg-slate-900 text-white shadow-xs font-bold"
               : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
           }`}
-          aria-current={isCoursesActive ? "page" : undefined}
+          aria-current={isExploreActive ? "page" : undefined}
         >
-          Courses
+          Explore
         </Link>
 
+        {session && (
+          <Link
+            href="/dashboard"
+            prefetch={true}
+            className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
+              isDashboardActive
+                ? "bg-slate-900 text-white shadow-xs font-bold"
+                : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+            aria-current={isDashboardActive ? "page" : undefined}
+          >
+            Dashboard
+          </Link>
+        )}
+
         <Link
-          href="/#categories"
-          className="px-3 py-1.5 rounded-full text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all duration-200"
+          href="/contributor"
+          prefetch={true}
+          className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
+            isStudioActive
+              ? "bg-slate-900 text-white shadow-xs font-bold"
+              : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+          }`}
+          aria-current={isStudioActive ? "page" : undefined}
         >
-          Categories
+          Studio
         </Link>
+
+        {session?.role === "ADMIN" && (
+          <Link
+            href="/admin"
+            prefetch={true}
+            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
+              isAdminActive
+                ? "bg-slate-900 text-white shadow-xs font-bold"
+                : "text-amber-700 hover:text-amber-900 hover:bg-amber-50"
+            }`}
+            aria-current={isAdminActive ? "page" : undefined}
+          >
+            <Shield className="w-3.5 h-3.5" />
+            <span>Admin</span>
+          </Link>
+        )}
 
         <Link
           href="/nova"
@@ -84,36 +122,6 @@ export function NavLinks({ session }: NavLinksProps) {
             Live
           </span>
         </Link>
-
-        {/* Role-aware link: Admin if ADMIN, else Studio */}
-        {session?.role === "ADMIN" ? (
-          <Link
-            href="/admin"
-            prefetch={true}
-            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
-              isAdminActive
-                ? "bg-slate-900 text-white shadow-xs font-bold"
-                : "text-amber-700 hover:text-amber-900 hover:bg-amber-50"
-            }`}
-            aria-current={isAdminActive ? "page" : undefined}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            <span>Admin</span>
-          </Link>
-        ) : (
-          <Link
-            href="/contributor"
-            prefetch={true}
-            className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
-              isStudioActive
-                ? "bg-slate-900 text-white shadow-xs font-bold"
-                : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-            aria-current={isStudioActive ? "page" : undefined}
-          >
-            Studio
-          </Link>
-        )}
       </nav>
 
       {/* Mobile Hamburger Button */}
@@ -131,12 +139,12 @@ export function NavLinks({ session }: NavLinksProps) {
 
       {/* Mobile Slide-down Menu */}
       {mobileMenuOpen && (
-        <div className="absolute top-20 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-xl py-5 px-6 md:hidden flex flex-col gap-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-20 left-0 w-full bg-white/98 backdrop-blur-xl border-b border-slate-200 shadow-xl py-5 px-6 md:hidden flex flex-col gap-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <Link
             href="/"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
+            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
               isHomeActive
                 ? "bg-slate-900 text-white shadow-xs"
                 : "text-slate-800 hover:bg-slate-100"
@@ -150,29 +158,76 @@ export function NavLinks({ session }: NavLinksProps) {
             href="/explore"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
-              isCoursesActive
+            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+              isExploreActive
                 ? "bg-slate-900 text-white shadow-xs"
                 : "text-slate-800 hover:bg-slate-100"
             }`}
           >
-            <span>Explore Courses</span>
-            {isCoursesActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+            <span>Explore</span>
+            {isExploreActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
           </Link>
 
           <Link
-            href="/#categories"
+            href="/contributor"
+            prefetch={true}
             onClick={closeMobileMenu}
-            className="flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm text-slate-800 hover:bg-slate-100 transition-all"
+            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+              isStudioActive
+                ? "bg-slate-900 text-white shadow-xs"
+                : "text-slate-800 hover:bg-slate-100"
+            }`}
           >
-            <span>Categories</span>
+            <div className="flex items-center gap-2">
+              <PenTool className="w-4 h-4 text-slate-700" />
+              <span>Studio</span>
+            </div>
+            {isStudioActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
           </Link>
+
+          {session && (
+            <Link
+              href="/dashboard"
+              prefetch={true}
+              onClick={closeMobileMenu}
+              className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+                isDashboardActive
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-800 hover:bg-slate-100"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4 text-slate-700" />
+                <span>Dashboard</span>
+              </div>
+              {isDashboardActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+            </Link>
+          )}
+
+          {session?.role === "ADMIN" && (
+            <Link
+              href="/admin"
+              prefetch={true}
+              onClick={closeMobileMenu}
+              className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+                isAdminActive
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-amber-800 bg-amber-50/60 hover:bg-amber-100"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-amber-600" />
+                <span>Admin Portal</span>
+              </div>
+              {isAdminActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+            </Link>
+          )}
 
           <Link
             href="/nova"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
+            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
               isNovaActive
                 ? "bg-slate-900 text-white shadow-xs"
                 : "text-slate-800 hover:bg-slate-100"
@@ -187,52 +242,42 @@ export function NavLinks({ session }: NavLinksProps) {
             </span>
           </Link>
 
-          {session?.role === "ADMIN" ? (
-            <Link
-              href="/admin"
-              prefetch={true}
-              onClick={closeMobileMenu}
-              className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
-                isAdminActive
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "text-amber-800 bg-amber-50/60 hover:bg-amber-100"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-amber-600" />
-                <span>Admin Portal</span>
+          {/* User Auth Section in Mobile Drawer */}
+          {session ? (
+            <div className="mt-2 pt-3 border-t border-slate-200 flex flex-col gap-2">
+              <div className="flex items-center justify-between px-2 text-xs font-bold text-slate-600">
+                <span>Signed in as <strong className="text-slate-900">{session.name}</strong></span>
+                <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-800">
+                  {session.role}
+                </span>
               </div>
-            </Link>
+              <form action="/api/auth/logout" method="POST" onSubmit={closeMobileMenu} className="w-full">
+                <button
+                  type="submit"
+                  className="w-full mt-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </form>
+            </div>
           ) : (
-            <Link
-              href="/contributor"
-              prefetch={true}
-              onClick={closeMobileMenu}
-              className={`flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
-                isStudioActive
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "text-slate-800 hover:bg-slate-100"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <PenTool className="w-4 h-4 text-slate-700" />
-                <span>Creator Studio</span>
-              </div>
-            </Link>
-          )}
-
-          {session && (
-            <Link
-              href={session.role === "ADMIN" ? "/admin" : session.role === "CONTRIBUTOR" ? "/contributor" : "/dashboard"}
-              prefetch={true}
-              onClick={closeMobileMenu}
-              className="mt-2 pt-3 border-t border-slate-100 flex items-center justify-between px-4 py-2 text-xs font-bold text-slate-600"
-            >
-              <span>Logged in as {session.name}</span>
-              <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-800">
-                {session.role}
-              </span>
-            </Link>
+            <div className="mt-2 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
+              <Link
+                href="/login"
+                onClick={closeMobileMenu}
+                className="flex-1 text-center py-2.5 rounded-xl border border-slate-200 text-slate-900 font-bold text-sm hover:bg-slate-50 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                onClick={closeMobileMenu}
+                className="flex-1 text-center py-2.5 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-black transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
           )}
         </div>
       )}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { hashPassword, createSession } from "@/lib/auth";
+import { hashPassword, createSession, getSessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { registerSchema } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
@@ -48,17 +48,21 @@ export async function POST(req: NextRequest) {
     });
 
     // Create session cookie
-    await createSession({
+    const token = await createSession({
       userId: user.id,
       email: user.email,
       name: user.name,
       role: user.role as any,
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "Registration successful", user },
       { status: 201 }
     );
+
+    response.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions());
+
+    return response;
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(

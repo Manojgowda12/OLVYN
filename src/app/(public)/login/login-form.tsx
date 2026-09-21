@@ -33,18 +33,36 @@ export function LoginForm() {
         throw new Error(data.error || "Invalid email or password.");
       }
 
-      // Check role to redirect appropriately if default
-      if (data.user?.role === "ADMIN" && (redirect === "/dashboard" || redirect === "/explore")) {
-        router.push("/admin");
-      } else if (data.user?.role === "CONTRIBUTOR" && (redirect === "/dashboard" || redirect === "/explore")) {
-        router.push("/contributor");
-      } else {
-        router.push(redirect);
+      // Sanitize redirect target (must be strictly relative path, no open redirects)
+      let safeRedirect = "/dashboard";
+      if (
+        redirect &&
+        redirect.startsWith("/") &&
+        !redirect.startsWith("//") &&
+        !redirect.startsWith("/\\") &&
+        !redirect.includes(":")
+      ) {
+        try {
+          const parsed = new URL(redirect, "http://localhost");
+          if (parsed.origin === "http://localhost") {
+            safeRedirect = parsed.pathname + parsed.search;
+          }
+        } catch {
+          safeRedirect = "/dashboard";
+        }
       }
-      router.refresh();
+
+      let targetUrl = safeRedirect;
+      if (data.user?.role === "ADMIN" && (safeRedirect === "/dashboard" || safeRedirect === "/explore")) {
+        targetUrl = "/admin";
+      } else if (data.user?.role === "CONTRIBUTOR" && (safeRedirect === "/dashboard" || safeRedirect === "/explore")) {
+        targetUrl = "/contributor";
+      }
+
+      // Full document navigation ensures session cookie is refreshed and server layout updates immediately
+      window.location.href = targetUrl;
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
-    } finally {
       setIsLoading(false);
     }
   };

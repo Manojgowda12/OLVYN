@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getPublishedCourses, getCachedCategories } from "@/modules/courses/course.service";
+import { getPublishedCourses, getCachedCategories, resolveCategorySlug } from "@/modules/courses/course.service";
 import { Search, Heart, Star, BookOpen, Clock, Filter } from "lucide-react";
 
 interface ExplorePageProps {
@@ -31,6 +31,22 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
     }),
     getCachedCategories(),
   ]);
+
+  const resolvedParamSlug = resolveCategorySlug(category);
+  const isCatActive = (cat: { slug: string; name: string }) => {
+    if (!category || category === "all") return false;
+    const param = category.toLowerCase().trim();
+    const slug = cat.slug.toLowerCase();
+    const name = cat.name.toLowerCase();
+    return (
+      slug === resolvedParamSlug ||
+      param === slug ||
+      param === name ||
+      param === slug.replace(/-/g, " ")
+    );
+  };
+
+  const isAllActive = !category || category === "all" || !categories.some(isCatActive);
 
   return (
     <div className="min-h-screen text-slate-900 py-10 px-6 lg:px-12 max-w-7xl mx-auto w-full">
@@ -71,26 +87,29 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
         <Link
           href={`/explore?${new URLSearchParams({ ...(q ? { q } : {}), ...(difficulty !== "all" ? { difficulty } : {}), category: "all" })}`}
           className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
-            category === "all"
+            isAllActive
               ? "bg-slate-900 text-white shadow-xs"
               : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900"
           }`}
         >
           All Topics
         </Link>
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={`/explore?${new URLSearchParams({ ...(q ? { q } : {}), ...(difficulty !== "all" ? { difficulty } : {}), category: cat.slug })}`}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
-              category === cat.slug
-                ? "bg-slate-900 text-white shadow-xs"
-                : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900"
-            }`}
-          >
-            {cat.name} <span className="opacity-60 text-[10px]">({cat._count.courses})</span>
-          </Link>
-        ))}
+        {categories.map((cat) => {
+          const active = isCatActive(cat);
+          return (
+            <Link
+              key={cat.id}
+              href={`/explore?${new URLSearchParams({ ...(q ? { q } : {}), ...(difficulty !== "all" ? { difficulty } : {}), category: cat.slug })}`}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                active
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900"
+              }`}
+            >
+              {cat.name} <span className="opacity-60 text-[10px]">({cat._count.courses})</span>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Difficulty Filters */}

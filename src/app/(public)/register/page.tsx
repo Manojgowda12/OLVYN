@@ -32,11 +32,9 @@ export default function RegisterPage() {
         throw new Error(data.error || "Failed to create account.");
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      window.location.href = "/dashboard";
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
-    } finally {
       setIsLoading(false);
     }
   };

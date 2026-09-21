@@ -32,7 +32,7 @@ export async function Navbar() {
         <NavLinks session={session} />
 
         {/* Right Action Pill */}
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-3">
           {session ? (
             <div className="flex items-center gap-2.5 pl-2 pr-1.5 py-1 rounded-full bg-white border border-slate-200 shadow-xs">
               <Link

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { verifyPassword, hashPassword, createSession, ensurePermanentAdmin } from "@/lib/auth";
+import { verifyPassword, hashPassword, createSession, ensurePermanentAdmin, getSessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { loginSchema } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
@@ -77,14 +77,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Establish session cookie
-    await createSession({
+    const token = await createSession({
       userId: user.id,
       email: user.email,
       name: user.name,
       role: user.role as any,
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       message: "Login successful",
       user: {
         id: user.id,
@@ -93,6 +93,10 @@ export async function POST(req: NextRequest) {
         role: user.role,
       },
     });
+
+    response.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions());
+
+    return response;
   } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(
