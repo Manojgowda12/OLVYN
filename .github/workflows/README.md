@@ -26,7 +26,7 @@ The CI workflow (`.github/workflows/ci.yml`) automatically triggers on:
 | **5** | **Prisma Validation** | `npx prisma validate` | Verifies the declarative Prisma schema syntax, models, enums, relations, and datasource configuration. |
 | **—** | **Client Generation** | `npx prisma generate` | Generates `@prisma/client` types required for typechecking and compilation. |
 | **6** | **TypeScript Typecheck** | `npx tsc --noEmit` | Validates strict TypeScript compilation across all 17 App Router routes, components, and server actions. Requires 0 errors. |
-| **7** | **Automated Tests** | `npx tsx scripts/test-chunking.ts`<br>`npx tsx scripts/test-nova-routing.ts`<br>`npx tsx scripts/test-health.ts` | Runs 102 automated domain test assertions validating educational content chunking, token estimation, code fence preservation, Nova AI query intent classification, and health endpoint degradation handling. |
+| **7** | **Automated Tests** | `npx tsx scripts/test-chunking.ts`<br>`npx tsx scripts/test-nova-routing.ts`<br>`npx tsx scripts/test-health.ts`<br>`npx tsx scripts/test-auth-security.ts` | Runs 141 automated domain and security test assertions validating chunking, Nova AI intent routing, health check reliability, and authentication security hardening (AUTH_SECRET, brute-force rate-limiting, error sanitization). |
 | **8** | **Production Build** | `npm run build` | Compiles optimized Next.js 15 production bundle, verifies page data collection, and validates static/dynamic route generation. |
 
 ---
@@ -89,3 +89,5 @@ When Continuous Delivery is implemented in the next phase, it will attach as a d
     Step 3: Run Post-Deploy Health Check against `GET /api/health`
     Step 4: Rollback deployment if health check returns non-200 within 60 seconds
 ```
+
+For the complete production deployment architecture, environment contract, and runbook, see [docs/deployment.md](../../docs/deployment.md).
