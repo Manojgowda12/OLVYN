@@ -49,7 +49,7 @@ export default function RegisterPage() {
           </Link>
           <h1 className="text-3xl font-black tracking-tight text-slate-900">Create your account</h1>
           <p className="text-sm font-medium text-slate-600 mt-1.5">
-            Join OpenLearner to explore courses, track your 0-100% progress, and get Nova AI tutoring
+            Join OLVYN to explore courses, track your 0-100% progress, and get Nova AI tutoring
           </p>
         </div>
 

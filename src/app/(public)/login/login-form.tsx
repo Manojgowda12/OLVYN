@@ -161,7 +161,7 @@ export function LoginForm() {
               className="w-full mt-2 py-3.5 px-4 rounded-full bg-[#121417] hover:bg-black disabled:opacity-60 text-[#d2f835] font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
               suppressHydrationWarning
             >
-              <span>{isLoading ? "Signing in..." : "Sign In to OpenLearner"}</span>
+              <span>{isLoading ? "Signing in..." : "Sign In to OLVYN"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

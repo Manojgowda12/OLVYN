@@ -3,9 +3,36 @@ import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { Role } from "./constants";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "openlearner_fallback_secret_must_be_overridden_in_production_32chars"
-);
+/**
+ * Safely resolves the JWT authentication secret key.
+ *
+ * Security Requirements:
+ * - Production: AUTH_SECRET must be explicitly defined and at least 32 characters long.
+ *   Missing or weak secrets in production fail safely by throwing an unrecoverable error.
+ *   Zero fallback to hardcoded production secrets.
+ * - Development/Test: If AUTH_SECRET is omitted in non-production, a clearly isolated local-only
+ *   key is used to allow offline and unit test workflows without crashing development.
+ */
+export function getJwtSecret(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+
+  if (process.env.NODE_ENV === "production") {
+    if (!secret || secret.trim().length === 0) {
+      throw new Error("AUTH_SECRET is not configured in production environment.");
+    }
+    if (secret.length < 32) {
+      throw new Error("AUTH_SECRET must be at least 32 characters in production.");
+    }
+    return new TextEncoder().encode(secret);
+  }
+
+  // Local development / testing only
+  if (!secret || secret.trim().length === 0) {
+    return new TextEncoder().encode("local_development_only_insecure_auth_secret_minimum_32chars");
+  }
+
+  return new TextEncoder().encode(secret);
+}
 
 export const SESSION_COOKIE_NAME = "openlearner_session";
 const SESSION_DURATION = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -45,11 +72,12 @@ export function getSessionCookieOptions() {
 }
 
 export async function createSession(payload: SessionPayload): Promise<string> {
+  const secret = getJwtSecret();
   const token = await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_DURATION}s`)
-    .sign(JWT_SECRET);
+    .sign(secret);
 
   try {
     const cookieStore = await cookies();
@@ -68,7 +96,8 @@ export async function getLegacySession(): Promise<SessionPayload | null> {
 
     if (!token) return null;
 
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const secret = getJwtSecret();
+    const { payload } = await jwtVerify(token, secret);
     return {
       userId: payload.userId as string,
       email: payload.email as string,

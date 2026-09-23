@@ -2,8 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyPassword, hashPassword, createSession, ensurePermanentAdmin, getSessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { loginSchema } from "@/lib/validations";
+import { authLoginRateLimiter, extractClientIp } from "@/lib/rate-limiter";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
+  // 1. Rate Limiting Check
+  const clientIp = extractClientIp(req);
+  const rateCheck = authLoginRateLimiter.check(clientIp);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      {
+        error: "Too many authentication attempts. Please try again later.",
+        retryAfter: rateCheck.resetSeconds,
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": rateCheck.resetSeconds.toString(),
+          "X-RateLimit-Limit": rateCheck.limit.toString(),
+          "X-RateLimit-Remaining": "0",
+        },
+      }
+    );
+  }
+
   try {
     const body = await req.json();
     const result = loginSchema.safeParse(body);
@@ -98,7 +120,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error("Login error:", error);
+    logger.apiError("/api/auth/login", "POST", 500, error);
     return NextResponse.json(
       { error: "Internal server error. Please try again later." },
       { status: 500 }

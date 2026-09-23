@@ -34,14 +34,14 @@ export function NavLinks({ session }: NavLinksProps) {
   return (
     <>
       {/* Desktop Navigation Links */}
-      <nav className="hidden md:flex items-center gap-2 lg:gap-3 text-[14px] font-semibold text-slate-700" aria-label="Main Navigation">
+      <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-[13px]" aria-label="Main Navigation">
         <Link
           href="/"
           prefetch={true}
-          className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
             isHomeActive
-              ? "bg-slate-900 text-white shadow-xs font-bold"
-              : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+              ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
           }`}
           aria-current={isHomeActive ? "page" : undefined}
         >
@@ -51,10 +51,10 @@ export function NavLinks({ session }: NavLinksProps) {
         <Link
           href="/explore"
           prefetch={true}
-          className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
             isExploreActive
-              ? "bg-slate-900 text-white shadow-xs font-bold"
-              : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+              ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
           }`}
           aria-current={isExploreActive ? "page" : undefined}
         >
@@ -65,10 +65,10 @@ export function NavLinks({ session }: NavLinksProps) {
           <Link
             href="/dashboard"
             prefetch={true}
-            className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
+            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
               isDashboardActive
-                ? "bg-slate-900 text-white shadow-xs font-bold"
-                : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+                ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
+                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
             }`}
             aria-current={isDashboardActive ? "page" : undefined}
           >
@@ -79,10 +79,10 @@ export function NavLinks({ session }: NavLinksProps) {
         <Link
           href="/contributor"
           prefetch={true}
-          className={`px-3 py-1.5 rounded-full transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
             isStudioActive
-              ? "bg-slate-900 text-white shadow-xs font-bold"
-              : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+              ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
           }`}
           aria-current={isStudioActive ? "page" : undefined}
         >
@@ -93,14 +93,14 @@ export function NavLinks({ session }: NavLinksProps) {
           <Link
             href="/admin"
             prefetch={true}
-            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
+            className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
               isAdminActive
-                ? "bg-slate-900 text-white shadow-xs font-bold"
-                : "text-amber-700 hover:text-amber-900 hover:bg-amber-50"
+                ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
+                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
             }`}
             aria-current={isAdminActive ? "page" : undefined}
           >
-            <Shield className="w-3.5 h-3.5" />
+            <Shield className="w-3.5 h-3.5 text-blue-400" />
             <span>Admin</span>
           </Link>
         )}
@@ -108,17 +108,16 @@ export function NavLinks({ session }: NavLinksProps) {
         <Link
           href="/nova"
           prefetch={true}
-          className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 transition-all duration-200 ${
             isNovaActive
-              ? "bg-slate-900 text-white shadow-xs font-bold"
-              : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+              ? "text-[#F5F7FF] bg-cyan-600/20 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.25)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
           }`}
           aria-current={isNovaActive ? "page" : undefined}
         >
-          <Sparkles className={`w-3.5 h-3.5 ${isNovaActive ? "text-[#d2f835]" : "text-slate-900"}`} />
+          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
           <span>Nova AI</span>
-          <span className="text-[10px] font-black uppercase tracking-wider bg-[#d2f835] text-slate-900 px-1.5 py-0.2 rounded-full flex items-center gap-1 shadow-2xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-900 animate-pulse"></span>
+          <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
             Live
           </span>
         </Link>
@@ -129,60 +128,71 @@ export function NavLinks({ session }: NavLinksProps) {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-900"
+          className="p-2 rounded-full text-[#A8B4CC] hover:text-[#EAF2FF] border border-blue-500/20 hover:border-blue-500/40 transition-colors focus:outline-none"
           aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileMenuOpen}
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Mobile Slide-down Menu */}
       {mobileMenuOpen && (
-        <div className="absolute top-20 left-0 w-full bg-white/98 backdrop-blur-xl border-b border-slate-200 shadow-xl py-5 px-6 md:hidden flex flex-col gap-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div
+          className="md:hidden fixed inset-x-0 top-[72px] p-5 border-b shadow-2xl flex flex-col gap-3 transition-all z-50"
+          style={{
+            background: "rgba(5, 12, 30, 0.98)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderBottomColor: "rgba(37, 99, 235, 0.25)",
+          }}
+        >
           <Link
             href="/"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+            className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
               isHomeActive
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-800 hover:bg-slate-100"
+                ? "bg-blue-600/20 text-[#F5F7FF] border border-blue-500/40"
+                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06]"
             }`}
           >
             <span>Home</span>
-            {isHomeActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+            {isHomeActive && <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06b6d4]" />}
           </Link>
 
           <Link
             href="/explore"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+            className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
               isExploreActive
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-800 hover:bg-slate-100"
+                ? "bg-blue-600/20 text-[#F5F7FF] border border-blue-500/40"
+                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06]"
             }`}
           >
-            <span>Explore</span>
-            {isExploreActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-blue-400" />
+              <span>Explore Courses</span>
+            </div>
+            {isExploreActive && <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06b6d4]" />}
           </Link>
 
           <Link
             href="/contributor"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+            className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
               isStudioActive
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-800 hover:bg-slate-100"
+                ? "bg-blue-600/20 text-[#F5F7FF] border border-blue-500/40"
+                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06]"
             }`}
           >
             <div className="flex items-center gap-2">
-              <PenTool className="w-4 h-4 text-slate-700" />
+              <PenTool className="w-4 h-4 text-blue-400" />
               <span>Studio</span>
             </div>
-            {isStudioActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+            {isStudioActive && <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06b6d4]" />}
           </Link>
 
           {session && (
@@ -190,17 +200,17 @@ export function NavLinks({ session }: NavLinksProps) {
               href="/dashboard"
               prefetch={true}
               onClick={closeMobileMenu}
-              className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+              className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                 isDashboardActive
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "text-slate-800 hover:bg-slate-100"
+                  ? "bg-blue-600/20 text-[#F5F7FF] border border-blue-500/40"
+                  : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06]"
               }`}
             >
               <div className="flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4 text-slate-700" />
+                <LayoutDashboard className="w-4 h-4 text-blue-400" />
                 <span>Dashboard</span>
               </div>
-              {isDashboardActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+              {isDashboardActive && <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06b6d4]" />}
             </Link>
           )}
 
@@ -209,17 +219,17 @@ export function NavLinks({ session }: NavLinksProps) {
               href="/admin"
               prefetch={true}
               onClick={closeMobileMenu}
-              className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+              className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                 isAdminActive
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "text-amber-800 bg-amber-50/60 hover:bg-amber-100"
+                  ? "bg-blue-600/20 text-[#F5F7FF] border border-blue-500/40"
+                  : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06]"
               }`}
             >
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-amber-600" />
+                <Shield className="w-4 h-4 text-amber-400" />
                 <span>Admin Portal</span>
               </div>
-              {isAdminActive && <span className="w-2 h-2 rounded-full bg-[#d2f835]" />}
+              {isAdminActive && <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06b6d4]" />}
             </Link>
           )}
 
@@ -227,34 +237,34 @@ export function NavLinks({ session }: NavLinksProps) {
             href="/nova"
             prefetch={true}
             onClick={closeMobileMenu}
-            className={`flex items-center justify-between px-4 py-2.5 rounded-2xl font-bold text-sm transition-all ${
+            className={`flex items-center justify-between px-4 py-2.5 rounded-xl font-semibold text-sm transition-all ${
               isNovaActive
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-800 hover:bg-slate-100"
+                ? "bg-cyan-600/20 text-[#F5F7FF] border border-cyan-500/40"
+                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06]"
             }`}
           >
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-slate-900" />
+              <Sparkles className="w-4 h-4 text-cyan-400" />
               <span>Nova AI Tutor</span>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-[#d2f835] text-slate-900 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 px-2 py-0.5 rounded-full">
               Live
             </span>
           </Link>
 
           {/* User Auth Section in Mobile Drawer */}
           {session ? (
-            <div className="mt-2 pt-3 border-t border-slate-200 flex flex-col gap-2">
-              <div className="flex items-center justify-between px-2 text-xs font-bold text-slate-600">
-                <span>Signed in as <strong className="text-slate-900">{session.name}</strong></span>
-                <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-800">
+            <div className="mt-2 pt-3 border-t border-blue-900/30 flex flex-col gap-2">
+              <div className="flex items-center justify-between px-2 text-xs font-semibold text-[#A8B4CC]">
+                <span>Signed in as <strong className="text-[#F5F7FF]">{session.name}</strong></span>
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-blue-950/60 border border-blue-500/30 text-blue-300">
                   {session.role}
                 </span>
               </div>
               <form action="/api/auth/logout" method="POST" onSubmit={closeMobileMenu} className="w-full">
                 <button
                   type="submit"
-                  className="w-full mt-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-bold transition-colors cursor-pointer"
+                  className="w-full mt-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-950/40 hover:bg-red-900/50 border border-red-500/30 text-red-200 hover:text-white text-xs font-bold transition-colors cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
@@ -262,18 +272,18 @@ export function NavLinks({ session }: NavLinksProps) {
               </form>
             </div>
           ) : (
-            <div className="mt-2 pt-3 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
+            <div className="mt-2 pt-3 border-t border-blue-900/30 flex flex-col sm:flex-row gap-2">
               <Link
                 href="/login"
                 onClick={closeMobileMenu}
-                className="flex-1 text-center py-2.5 rounded-xl border border-slate-200 text-slate-900 font-bold text-sm hover:bg-slate-50 transition-colors"
+                className="flex-1 text-center py-2.5 rounded-xl border border-blue-500/40 bg-blue-950/40 text-[#F5F7FF] font-semibold text-sm hover:bg-blue-900/40 transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
                 onClick={closeMobileMenu}
-                className="flex-1 text-center py-2.5 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-black transition-colors"
+                className="flex-1 text-center py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-sm shadow-[0_0_12px_rgba(37,99,235,0.4)] transition-colors"
               >
                 Get Started
               </Link>

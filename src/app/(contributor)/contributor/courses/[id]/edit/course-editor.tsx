@@ -730,7 +730,7 @@ export function CourseEditor({ course: initialCourse, categories }: CourseEditor
           <div>
             <p className="font-bold text-emerald-800">Published & Live</p>
             <p className="text-emerald-700 mt-0.5">
-              This course is published in the OpenLearnerAI catalog. Contact an administrator if you require major version changes.
+              This course is published in the OLVYN catalog. Contact an administrator if you require major version changes.
             </p>
           </div>
         </div>
@@ -1311,7 +1311,7 @@ export function CourseEditor({ course: initialCourse, categories }: CourseEditor
                       rows={14}
                       value={lessonContent}
                       onChange={(e) => setLessonContent(e.target.value)}
-                      placeholder="# Concept Title&#10;&#10;Explain the concepts with **bold text**, `inline code`, and blockquotes:&#10;&#10;```typescript&#10;const greeting = 'Hello, OpenLearner!';&#10;```"
+                      placeholder="# Concept Title&#10;&#10;Explain the concepts with **bold text**, `inline code`, and blockquotes:&#10;&#10;```typescript&#10;const greeting = 'Hello, OLVYN!';&#10;```"
                       className="w-full p-4 rounded-2xl bg-slate-900 text-slate-100 border border-slate-800 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#d2f835] leading-relaxed resize-y scrollbar-thin"
                     />
                   </div>

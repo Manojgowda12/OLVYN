@@ -1,0 +1,73 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    name: Lint, Test, & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NODE_ENV: production
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/ci_placeholder?pgbouncer=true"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/ci_placeholder"
+      AUTH_SECRET: "ci_dummy_auth_secret_minimum_32_characters_long_for_build"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      NEXT_PUBLIC_SUPABASE_URL: "https://ci-placeholder.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "ci-placeholder-anon-key"
+      SUPABASE_SERVICE_ROLE_KEY: "ci-placeholder-service-key"
+      GEMINI_API_KEY: "ci-placeholder-gemini-key"
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js 20 with npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: 3. Install dependencies
+        run: npm ci
+
+      - name: 4. Run dependency security audit
+        run: |
+          echo "Running dependency security audit (checking for high and critical vulnerabilities)..."
+          npm audit --audit-level=high || echo "::warning ::High or critical vulnerabilities detected in dependencies. Review npm audit report."
+
+      - name: 5. Validate Prisma Schema
+        run: npx prisma validate
+
+      - name: Generate Prisma Client types
+        run: npx prisma generate
+
+      - name: 6. Run TypeScript validation
+        run: npx tsc --noEmit
+
+      - name: 7. Run automated test suites (Isolated Unit & Domain Logic)
+        run: |
+          echo "Running Chunking Unit Tests..."
+          npx tsx scripts/test-chunking.ts
+          echo "Running Nova Intent Routing & Quality Tests..."
+          npx tsx scripts/test-nova-routing.ts
+          echo "Running Health Endpoint & Reliability Tests..."
+          npx tsx scripts/test-health.ts
+          echo "Running Authentication Security Tests..."
+          npx tsx scripts/test-auth-security.ts
+
+      - name: 8. Run production build
+        run: npm run build

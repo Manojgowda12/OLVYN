@@ -147,7 +147,7 @@ export async function generateAssistantResponse({
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      let systemPrompt = `You are Nova, the elite AI Learning Companion and Senior Tutor for OpenLearner AI (an open, community-powered education platform).
+      let systemPrompt = `You are Nova, the elite AI Learning Companion and Senior Tutor for OLVYN (an open, community-powered education platform).
 Your core mission is to provide clear, pedagogically sound, encouraging, and deeply practical explanations to students of all skill levels.
 
 CRITICAL SECURITY & BEHAVIORAL DIRECTIVES:
@@ -326,7 +326,7 @@ print(f"You are taking {course_title} and have completed {completed_lessons} les
       .replace(/ignore (all )?previous instructions[.:\s]*/gi, "");
 
     smartReply = `### 💡 Curriculum-Grounded Explanation: **${topChunk.lessonTitle || topChunk.courseTitle}**\n\n` +
-      `According to the verified [${topChunk.courseTitle}](/courses/${topChunk.courseSlug}) curriculum in OpenLearner AI:\n\n` +
+      `According to the verified [${topChunk.courseTitle}](/courses/${topChunk.courseSlug}) curriculum in OLVYN:\n\n` +
       `> ${sanitizedContent.trim().replace(/\r?\n/g, "\n> ")}\n\n` +
       `**Key Takeaways:**\n` +
       `- This concept is covered in depth in lesson ${sourceLink}.\n` +
@@ -389,7 +389,7 @@ print(f"You are taking {course_title} and have completed {completed_lessons} les
       `*Want me to explain how React 19 Server Actions work or compare Next.js Pages Router vs. App Router?*`;
   } else {
     smartReply = `### 👋 Hi there! I'm Nova, your AI Learning Companion.\n\n` +
-      `I'm connected to the live OpenLearner curriculum database. Here's what I can do for you:\n\n` +
+      `I'm connected to the live OLVYN curriculum database. Here's what I can do for you:\n\n` +
       `1. **📚 Course Recommendations:** Find the perfect course tailored to your current experience level and goals.\n` +
       `2. **🧩 Concept Explanations:** Get clear explanations, analogies, and code snippets for any topic.\n` +
       `3. **🎯 Personalized Roadmaps:** Build a custom week-by-week study plan.\n` +

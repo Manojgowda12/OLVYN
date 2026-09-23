@@ -2,9 +2,20 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "openlearner_fallback_secret_must_be_overridden_in_production_32chars"
-);
+function getMiddlewareJwtSecret(): Uint8Array | null {
+  const secret = process.env.AUTH_SECRET;
+  if (process.env.NODE_ENV === "production") {
+    if (!secret || secret.trim().length === 0 || secret.length < 32) {
+      return null; // Missing or weak secret in production fails closed safely
+    }
+    return new TextEncoder().encode(secret);
+  }
+  // Local development / testing only
+  if (!secret || secret.trim().length === 0) {
+    return new TextEncoder().encode("local_development_only_insecure_auth_secret_minimum_32chars");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 const LEGACY_COOKIE_NAME = "openlearner_session";
 
@@ -29,9 +40,10 @@ export async function middleware(request: NextRequest) {
 
   if (!isAuthenticated) {
     const legacyToken = request.cookies.get(LEGACY_COOKIE_NAME)?.value;
-    if (legacyToken) {
+    const jwtSecret = getMiddlewareJwtSecret();
+    if (legacyToken && jwtSecret) {
       try {
-        const { payload } = await jwtVerify(legacyToken, JWT_SECRET);
+        const { payload } = await jwtVerify(legacyToken, jwtSecret);
         isAuthenticated = true;
         resolvedRole = (payload.role as string) || "LEARNER";
       } catch {

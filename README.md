@@ -1,4 +1,4 @@
-# Open Learning Platform (OpenLearner AI)
+# OLVYN — Open Learning Platform
 
 An open, transparent learning platform where anyone can discover, learn, and contribute legally shareable educational courses with AI-powered tutoring.
 

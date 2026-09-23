@@ -12,9 +12,7 @@ interface BenchmarkResult {
 
 const prisma = new PrismaClient();
 const BASE_URL = "http://localhost:3000";
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "openlearner_fallback_secret_must_be_overridden_in_production_32chars"
-);
+import { getJwtSecret } from "../src/lib/auth-legacy";
 
 async function getLearnerCookie(): Promise<string> {
   const learner = await prisma.user.findFirst({ where: { role: "LEARNER" } });
@@ -28,7 +26,7 @@ async function getLearnerCookie(): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(getJwtSecret());
   return `openlearner_session=${token}`;
 }
 

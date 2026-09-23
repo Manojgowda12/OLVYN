@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { resolveOrCreateUser } from "@/lib/auth-service";
+import { logger } from "@/lib/logger";
+import { authOAuthRateLimiter, extractClientIp } from "@/lib/rate-limiter";
 
 /**
  * Handles Supabase PKCE OAuth callback for Google sign-in.
@@ -9,11 +11,28 @@ import { resolveOrCreateUser } from "@/lib/auth-service";
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  const origin = requestUrl.origin;
+
+  // Rate Limiting Check
+  const clientIp = extractClientIp(request);
+  const rateCheck = authOAuthRateLimiter.check(clientIp);
+  if (!rateCheck.allowed) {
+    return NextResponse.redirect(
+      new URL("/login?error=Too+many+authentication+attempts.+Please+try+again+later.", origin)
+    );
+  }
+
   const code = requestUrl.searchParams.get("code");
   const rawNext = requestUrl.searchParams.get("next") || requestUrl.searchParams.get("redirect");
 
-  // Prevent open redirect attacks by ensuring path starts with / and not //
-  const hasCustomRedirect = Boolean(rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//"));
+  // Prevent open redirect attacks by ensuring internal relative path only
+  const isSafeInternalPath = Boolean(
+    rawNext &&
+    rawNext.startsWith("/") &&
+    !rawNext.startsWith("//") &&
+    !rawNext.includes(":") &&
+    !rawNext.includes("\\")
+  );
 
   if (code) {
     try {
@@ -32,7 +51,7 @@ export async function GET(request: Request) {
 
           // Role-based redirection:
           // If no specific lesson/course page requested, route each user to their authoritative role dashboard
-          let destination = hasCustomRedirect ? rawNext! : null;
+          let destination = isSafeInternalPath ? rawNext! : null;
           if (!destination || destination === "/dashboard") {
             if (appUser.role === "ADMIN") {
               destination = "/admin";
@@ -43,24 +62,24 @@ export async function GET(request: Request) {
             }
           }
 
-          return NextResponse.redirect(new URL(destination, requestUrl.origin));
+          return NextResponse.redirect(new URL(destination, origin));
         }
 
         if (error) {
-          console.error("Supabase OAuth code exchange error:", error.message);
+          logger.apiError("/auth/callback", "GET", 400, error);
           return NextResponse.redirect(
-            new URL(`/login?error=${encodeURIComponent(error.message)}`, requestUrl.origin)
+            new URL("/login?error=Authentication+failed.+Please+try+again.", origin)
           );
         }
       }
     } catch (err: any) {
-      console.error("Unexpected error in auth callback:", err);
+      logger.apiError("/auth/callback", "GET", 500, err);
       return NextResponse.redirect(
-        new URL(`/login?error=${encodeURIComponent("Authentication failed. Please try again.")}`, requestUrl.origin)
+        new URL("/login?error=Authentication+failed.+Please+try+again.", origin)
       );
     }
   }
 
   // Return to login if no code was provided
-  return NextResponse.redirect(new URL("/login", requestUrl.origin));
+  return NextResponse.redirect(new URL("/login", origin));
 }

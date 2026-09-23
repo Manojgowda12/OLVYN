@@ -76,7 +76,7 @@ const INITIAL_PROMPT_CHIPS = [
   {
     icon: BookOpen,
     title: "Explore Course Catalog",
-    prompt: "What are the most popular beginner courses currently published on OpenLearner?",
+    prompt: "What are the most popular beginner courses currently published on OLVYN?",
   },
 ];
 
@@ -85,7 +85,7 @@ const WELCOME_MESSAGE: Message = {
   role: "assistant",
   content:
     "### 👋 Hello! I'm Nova, your AI Learning Companion & Tutor.\n\n" +
-    "I am directly connected to the live OpenLearner curriculum database. Ask me anything about our courses, request personalized study roadmaps, practice coding challenges, or get instant explanations on complex topics.\n\n" +
+    "I am directly connected to the live OLVYN curriculum database. Ask me anything about our courses, request personalized study roadmaps, practice coding challenges, or get instant explanations on complex topics.\n\n" +
     "*How can I help you learn today?*",
   timestamp: new Date(),
 };

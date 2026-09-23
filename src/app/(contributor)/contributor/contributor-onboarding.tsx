@@ -46,7 +46,7 @@ export function ContributorOnboarding({ userName, userEmail }: ContributorOnboar
               <span>Creator Studio Onboarding</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Start Authoring Courses on OpenLearner
+              Start Authoring Courses on OLVYN
             </h1>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
               You are currently signed in with a <strong>Learner</strong> account. To build syllabi, author Markdown lessons, and submit courses for peer review, activate your Contributor workspace.
