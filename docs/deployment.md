@@ -1,234 +1,324 @@
-# OLVYN — Production Continuous Deployment (CD) Architecture & Runbook
+# OLVYN — Production Deployment Runbook
 
 > **Author**: DevOps & SRE Team  
-> **Target Environment**: Vercel (Edge & Serverless Node.js Runtime) + Supabase (PostgreSQL 15, Auth, Storage) + GitHub Actions (CI)  
+> **Target Environment**: Render (Node.js Web Service) + Supabase (PostgreSQL 15, Auth, Storage) + GitHub Actions (CI)  
 > **Last Updated**: September 2026  
-> **Status**: Production-Ready Deployment Foundation
+> **Status**: Production-Ready
 
 ---
 
-## 1. Executive Summary & Architecture
-
-OLVYN utilizes an enterprise-grade, decoupled Continuous Delivery architecture designed for zero-downtime releases, cryptographic session integrity, automated security gates, and resilient database connection pooling.
+## 1. Architecture Overview
 
 ```
-Developer Feature Branch
-          ↓
-  [Pull Request]
-          ↓
-  [GitHub Actions CI] (Quality & Security Gate)
-    ├── npm ci & audit
-    ├── npx prisma validate & generate
-    ├── npx tsc --noEmit (Typecheck: 0 errors)
-    ├── Automated Test Suites (141 isolated assertions)
-    └── Next.js 15 Production Build Verification
-          ↓
-   [Merge to main]
-          ↓
-  [Vercel Git Integration] (Zero-Config CD)
-    ├── Serverless & Edge Compilation
-    ├── Atomic Immutable Deployment
-    └── Production Domain Alias (e.g. olvyn.ai / olvyn.vercel.app)
-          ↓
-  [Post-Deploy Health Smoke Check]
-    └── GET https://[DEPLOYMENT_URL]/api/health
-          ├── HTTP 200 OK
-          ├── application: "ok"
-          └── database: "ok" (Supabase PostgreSQL SELECT 1 probe)
+Local Development
+       ↓
+   [Git Push]
+       ↓
+   [GitHub — Manojgowda12/Olvyn — branch: master]
+       ↓
+   [GitHub Actions CI] (Quality & Security Gate)
+     ├── npm ci & audit
+     ├── npx prisma validate & generate
+     ├── npx tsc --noEmit (TypeScript: 0 errors)
+     ├── Automated Test Suites (306 isolated assertions)
+     └── Next.js 15 Production Build Verification
+       ↓
+   [Render Web Service] (Auto-Deploy on push)
+     ├── npm ci
+     ├── npx prisma generate
+     ├── npm run build (next build)
+     └── npm start (next start — listens on $PORT)
+       ↓
+   [Supabase PostgreSQL]
+   [Supabase Auth]
+   [Supabase Storage]
+       ↓
+   [Production OLVYN]
+     └── GET /api/health → 200 OK
 ```
 
 ### Responsibility Matrix
 
-| Infrastructure Layer | Technology | Ownership & Responsibility |
+| Infrastructure Layer | Technology | Responsibility |
 |---|---|---|
-| **Edge & Web Compute** | Vercel | Next.js 15 App Router, Edge Middleware, Static Asset CDN, Serverless Functions. |
-| **Relational Database** | Supabase PostgreSQL | Managed PostgreSQL, pgvector extension, Supavisor connection pooling. |
-| **Object Storage** | Supabase Storage | Educational file assets, curriculum PDFs, video media storage. |
-| **Authentication Provider** | Supabase Auth + jose | Google OAuth (PKCE flow) and native encrypted JWT session cookies. |
-| **Data Schema & ORM** | Prisma ORM (v6) | Declarative schema, client generation, deterministic migration tracking. |
-| **Continuous Integration** | GitHub Actions | Automated security audit, type checking, schema validation, isolated unit tests. |
+| **Web Compute** | Render Web Service | Next.js 15 App Router, API routes, server-side rendering |
+| **Relational Database** | Supabase PostgreSQL | Managed PostgreSQL, pgvector, Supavisor connection pooling |
+| **Object Storage** | Supabase Storage | Educational file assets, curriculum PDFs, media |
+| **Authentication** | Supabase Auth + jose JWT | Google OAuth (PKCE) + native encrypted JWT session cookies |
+| **ORM** | Prisma v6 | Declarative schema, client generation, deterministic migrations |
+| **Continuous Integration** | GitHub Actions | Security audit, type checking, schema validation, isolated tests |
 
 ---
 
-## 2. Vercel Configuration & Integration Strategy
+## 2. Render Web Service Configuration
 
-### Zero-Config Architecture Decision
-Vercel is the creator and canonical platform for Next.js. Next.js 15 App Router applications are natively zero-config on Vercel:
-- **Build Command**: Automatically detects `npm run build` (`next build`).
-- **Output Directory**: Automatically maps `.next`.
-- **Edge Middleware**: Next.js `src/middleware.ts` automatically compiles and executes across Vercel’s global Edge network.
-- **Headers & Caching**: Cache policies defined in `next.config.mjs` (such as immutable asset caching for `/logo.jpg`) are natively honored.
-- **Decision**: A manual `vercel.json` is **not required** and intentionally omitted to prevent brittle configuration drift and conflicting build overrides.
+### Service Settings
 
-### Vercel Git Integration
-To avoid the race conditions and competing deployment triggers that occur when both a GitHub Action and Vercel CLI deploy simultaneously, OLVYN uses **Native Vercel Git Integration**:
-1. Connect the GitHub repository in the Vercel Dashboard (`Import Project`).
-2. Framework Preset: `Next.js`.
-3. Root Directory: `./`.
-4. Production Branch: `main` (or `master`).
-5. Configure Production Environment Variables as specified in Section 4.
+| Setting | Value |
+|---|---|
+| **Service Type** | Web Service |
+| **Environment** | Node |
+| **Region** | Choose closest to Supabase project region |
+| **Branch** | `master` |
+| **Root Directory** | `./` |
+| **Node Version** | `20` |
+| **Build Command** | `npm ci && npx prisma generate && npm run build` |
+| **Start Command** | `npm start` |
+| **Health Check Path** | `/api/health` |
 
----
+> [!IMPORTANT]
+> **Why `npm start`?** The `package.json` `start` script runs `next start`, which automatically respects the `PORT` environment variable injected by Render. Do NOT use `node server.js` — there is no custom server.
 
-## 3. Supabase Configuration
+> [!NOTE]
+> Render automatically sets the `PORT` environment variable. Next.js 15 `next start` reads `$PORT` and binds to it by default.
 
-### Connection Topologies
-Supabase provides two distinct connection endpoints that must be configured:
+### Auto-Deploy
 
-1. **Transaction Pooler (Supavisor — Port 6543)**:
-   - Form: `postgresql://postgres.[REF]:[PASS]@[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true`
-   - Use Case: Serverless Next.js API routes and server actions (`DATABASE_URL`).
-   - Advantage: Prevents PostgreSQL connection exhaustion when serverless lambdas scale out rapidly.
-
-2. **Direct / Session Connection (Port 5432)**:
-   - Form: `postgresql://postgres.[REF]:[PASS]@[REGION].pooler.supabase.com:5432/postgres` (or `db.[REF].supabase.co:5432`)
-   - Use Case: Prisma CLI migrations (`DIRECT_URL`).
-   - Advantage: Direct TCP session required for DDL schema migrations, transaction-level advisory locks, and enum alterations.
+Connect the GitHub repository `Manojgowda12/Olvyn` to the Render service. Render will automatically redeploy on every push to the `master` branch after CI passes (configure the auto-deploy trigger in Render settings).
 
 ---
 
-## 4. Production Environment Variable Contract
+## 3. Environment Variables
 
-Every production environment must have the following variables explicitly configured in the **Vercel Project Settings ➔ Environment Variables**.
+Configure ALL variables below in **Render Dashboard → Your Service → Environment**.
 
 > [!CAUTION]
 > **STRICT SECURITY RULES**:
-> - NEVER put real production secrets into source control or documentation.
+> - NEVER put real credentials into source control.
 > - NEVER commit `.env`, `.env.local`, or `.env.production`.
-> - NEVER expose `SUPABASE_SERVICE_ROLE_KEY` or `AUTH_SECRET` to client-side code (no `NEXT_PUBLIC_` prefix).
+> - NEVER use `NEXT_PUBLIC_` prefix for `SUPABASE_SERVICE_ROLE_KEY`, `AUTH_SECRET`, `GEMINI_API_KEY`, or any secret.
 
 ### A. Server-Only Secrets (Never Exposed to Browser)
 
-| Environment Variable | Required | Minimum Security Constraint | Description |
+| Variable | Required | Minimum Constraint | Purpose |
 |---|:---:|---|---|
-| `DATABASE_URL` | **Yes** | Valid PostgreSQL URL with Port 6543 and `?pgbouncer=true` | Transaction-pooled connection string used by runtime Prisma Client. |
-| `DIRECT_URL` | **Yes** | Valid PostgreSQL URL with Port 5432 | Direct session connection string used by Prisma migration engine (`prisma migrate deploy`). |
-| `AUTH_SECRET` | **Yes** | Minimum **32 characters**, high-entropy cryptographic string | Secret key for signing and verifying application session JWTs. Fails closed if missing in production. |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Yes** | High-entropy Supabase service role JWT | Privileged server-side key for storage bucket administration and secure backend uploads. |
-| `GEMINI_API_KEY` | **Yes** | Valid Google AI Studio / Gemini API key | Powers Nova AI grounded learning assistant and curriculum embeddings. |
-| `ADMIN_EMAIL` | **Yes** | Valid email address | Canonical permanent platform administrator identity. |
-| `ADMIN_PASSWORD` | **Yes** | Minimum 12 characters, complex password | Default initial password for administrative initialization fallback. |
-| `GEMINI_EMBEDDING_MODEL` | No | Default: `gemini-embedding-2` | Embedding model identifier for RAG indexing. |
-| `GEMINI_EMBEDDING_DIMENSIONS` | No | Default: `768` | Vector dimension size for pgvector embeddings. |
+| `DATABASE_URL` | ✅ | PostgreSQL URL — port **6543**, `?pgbouncer=true` | Runtime Prisma Client (transaction pooler) |
+| `DIRECT_URL` | ✅ | PostgreSQL URL — port **5432** | Prisma migration engine only |
+| `AUTH_SECRET` | ✅ | **≥ 32 characters**, high-entropy | JWT session signing — fails closed if missing/short in production |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role JWT | Server-side storage admin, secure backend ops |
+| `GEMINI_API_KEY` | ✅ | Valid Google AI Studio key | Nova AI assistant + RAG embeddings |
+| `ADMIN_EMAIL` | Optional | Valid email | Platform admin identity (fallback: `admin@openlearner.ai`) |
+| `ADMIN_PASSWORD` | Optional | ≥ 12 chars, complex | Admin initialization fallback password |
+| `GEMINI_EMBEDDING_MODEL` | Optional | String | Embedding model ID (default: `gemini-embedding-2`) |
+| `GEMINI_EMBEDDING_DIMENSIONS` | Optional | Integer string | pgvector dimensions (default: `768`) |
 
 ### B. Public Variables (Safe for Browser Bundle)
 
-| Environment Variable | Required | Example Format | Description |
+| Variable | Required | Example | Purpose |
 |---|:---:|---|---|
-| `NEXT_PUBLIC_APP_URL` | **Yes** | `https://olvyn.ai` or `https://olvyn.vercel.app` | Canonical public origin used for OAuth redirect validation and cookie security rules. |
-| `NEXT_PUBLIC_SUPABASE_URL` | **Yes** | `https://[REF].supabase.co` | Public Supabase HTTPS endpoint for client-side Auth and storage links. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Yes** | Public anonymous JWT string | Browser-safe Supabase public key for client-side session hydration. |
+| `NEXT_PUBLIC_APP_URL` | ✅ | `https://olvyn.onrender.com` | Canonical origin — controls cookie `Secure` flag |
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | `https://[REF].supabase.co` | Supabase HTTPS endpoint |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Public anon JWT | Client-side Supabase Auth session hydration |
+
+> [!WARNING]
+> Set `NEXT_PUBLIC_APP_URL` to your actual Render URL (e.g. `https://olvyn.onrender.com`). This variable controls whether session cookies use the `Secure` flag. If set to a localhost URL in production, cookies will NOT be secure.
+
+### Generating AUTH_SECRET
+
+```bash
+# Generate a secure 64-character random secret:
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
 ---
 
-## 5. Production Database Migration Process
+## 4. Supabase Configuration
 
-### Deterministic Migration Command
-In production, schema changes must be applied strictly using:
+### Database Connection Topology
+
+Supabase provides two connection endpoints. Both are required:
+
+**1. Transaction Pooler (Supavisor — Port 6543)** → `DATABASE_URL`
+```
+postgresql://postgres.[REF]:[PASS]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true
+```
+Use Case: Runtime Prisma Client (all API routes, server components).
+
+**2. Direct Session Connection (Port 5432)** → `DIRECT_URL`
+```
+postgresql://postgres.[REF]:[PASS]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+```
+Use Case: Prisma migration engine (`prisma migrate deploy`). DDL operations require direct TCP.
+
+### Required Supabase Auth Dashboard Settings
+
+In **Supabase Dashboard → Authentication → URL Configuration**:
+
+| Setting | Value |
+|---|---|
+| **Site URL** | `https://olvyn.onrender.com` (your Render URL) |
+| **Additional Redirect URLs** | `https://olvyn.onrender.com/auth/callback` |
+
+> [!IMPORTANT]
+> The redirect URL must exactly match what the OAuth callback receives. The application derives `origin` dynamically from `request.url` — it does NOT use hardcoded localhost in production.
+
+### Google Cloud OAuth Configuration
+
+In **Google Cloud Console → APIs & Services → Credentials → Your OAuth 2.0 Client**:
+
+Add the following **Authorized redirect URI** (this is Supabase's callback — NOT the OLVYN app URL):
+```
+https://[YOUR-SUPABASE-PROJECT-REF].supabase.co/auth/v1/callback
+```
+
+The full OAuth flow:
+```
+OLVYN /api/auth/google
+  → supabase.auth.signInWithOAuth(redirectTo: https://olvyn.onrender.com/auth/callback)
+  → Google (redirects to Supabase)
+  → Supabase /auth/v1/callback (exchanges code, redirects to OLVYN)
+  → OLVYN /auth/callback (exchanges Supabase code for session, sets cookies)
+  → Application dashboard
+```
+
+---
+
+## 5. Database Migration Procedure
+
+### Production Migration Command
 
 ```bash
 npx prisma migrate deploy
 ```
 
 > [!WARNING]
-> **PROHIBITED COMMANDS IN PRODUCTION**:
-> - `npx prisma db push` — **STRICTLY PROHIBITED** (bypasses migration history and risks unrecoverable data loss).
-> - `npx prisma migrate dev` — **STRICTLY PROHIBITED** (prompts interactively and creates new migration files).
-> - `npx prisma migrate reset` — **STRICTLY PROHIBITED** (drops and deletes the entire database).
+> **PROHIBITED IN PRODUCTION:**
+> - `prisma db push` — bypasses migration history, risks data loss
+> - `prisma migrate dev` — interactive, creates new migration files
+> - `prisma migrate reset` — **DROPS AND DESTROYS THE DATABASE**
 
-### Migration Execution Procedure
-1. Verify current migration sync state against the database:
-   ```bash
-   npx prisma migrate status
-   ```
-2. Apply pending migrations using the direct port 5432 connection (`DIRECT_URL`):
-   ```bash
-   npx prisma migrate deploy
-   ```
-3. Verify that all migrations report `Database schema is up to date!`.
+### Current Migrations (as of September 2026)
+
+| Migration | Status |
+|---|---|
+| `20260910000000_initial_schema` | Applied |
+| `20260916000000_production_postgresql_schema` | Applied |
+| `20260918000000_add_rag_document_models` | Applied |
+| `20260919000000_add_supabase_auth_and_user_memory` | Applied |
+
+### Running Migrations Against Production Supabase
+
+```bash
+# Set env vars locally pointing at production Supabase
+export DATABASE_URL="..."
+export DIRECT_URL="postgresql://postgres.[REF]:[PASS]@...supabase.com:5432/postgres"
+
+# Check migration status first (non-destructive)
+npx prisma migrate status
+
+# Apply pending migrations
+npx prisma migrate deploy
+```
+
+> [!NOTE]
+> The Render build command does NOT run `prisma migrate deploy` — migrations must be applied manually or via a separate Render pre-deploy job before the first deployment.
 
 ---
 
-## 6. GitHub Configuration & CI Quality Gate
+## 6. GitHub Actions CI
 
-### Branch Protection Rules on `main` / `master`
-To ensure unverified code never reaches production:
-1. Navigate to **GitHub Repository ➔ Settings ➔ Branches ➔ Branch protection rules**.
-2. Target branch: `main` (or `master`).
-3. Enable **Require a pull request before merging**.
-4. Enable **Require status checks to pass before merging**:
-   - Check required: `validate-and-build` (the GitHub Actions CI job).
-5. Enable **Require branches to be up to date before merging**.
-6. Enable **Do not allow bypassing the above settings**.
+The CI pipeline (`.github/workflows/ci.yml`) runs on every push to `master` and on pull requests targeting `master`.
 
-### CI Pipeline Verification Summary
-Every Pull Request automatically executes `.github/workflows/ci.yml`:
-1. `npm ci` (reproducible dependency tree)
-2. `npm audit --audit-level=high` (vulnerability audit)
-3. `npx prisma validate` & `npx prisma generate` (schema integrity)
-4. `npx tsc --noEmit` (strict TypeScript validation, 0 errors allowed)
-5. Automated test suites (306 total assertions):
+**Pipeline Steps:**
+1. `npm ci` — reproducible dependency install
+2. `npm audit --audit-level=high` — vulnerability audit
+3. `npx prisma validate` + `npx prisma generate` — schema integrity
+4. `npx tsc --noEmit` — TypeScript strict validation (0 errors)
+5. Automated test suites (306 assertions):
    - `scripts/test-chunking.ts`
    - `scripts/test-nova-routing.ts`
    - `scripts/test-health.ts`
    - `scripts/test-auth-security.ts`
-6. `npm run build` (Next.js production build verification)
+6. `npm run build` — Next.js production build verification
+
+**CI uses placeholder secrets only** — it does NOT connect to production Supabase or modify the database.
 
 ---
 
-## 7. Post-Deployment Verification & Health Smoke Test
+## 7. Health Check
 
-Once Vercel finishes deploying to production, execute the automated smoke test:
-
-```bash
-npx tsx scripts/smoke-health.ts https://[YOUR_PRODUCTION_DOMAIN]
+```
+GET /api/health
 ```
 
-### Health Check Verification Contract
-The smoke test queries `GET /api/health` and verifies:
-1. **HTTP Status**: Exactly `200 OK`.
-2. **Payload Top-Level**: `status === "ok"`.
-3. **Application Subsystem**: `checks.application === "ok"`.
-4. **Database Subsystem**: `checks.database === "ok"` (verified via live non-destructive `SELECT 1` probe with a 3000ms timeout).
-5. **Payload Safety**: Confirms zero leaking of secrets, connection strings, or internal paths.
+**Healthy:** HTTP `200 OK`
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-09-23T...",
+  "version": "0.1.0",
+  "uptime": 42,
+  "checks": {
+    "application": "ok",
+    "database": "ok"
+  }
+}
+```
 
-### Handling a Degraded Health Check (HTTP 503)
-If `/api/health` returns `503 Service Unavailable`:
-- The database probe failed or timed out.
-- The smoke test outputs a clear failure report and exits with code `1`.
-- Follow the Rollback Procedure in Section 8 immediately.
+**Degraded:** HTTP `503 Service Unavailable`
+```json
+{ "checks": { "database": "unhealthy" } }
+```
 
----
+The endpoint is **unauthenticated**, performs a non-destructive `SELECT 1` with a 3-second timeout, and exposes no secrets.
 
-## 8. Rollback Strategy & Schema Safety
+### Post-Deployment Smoke Test
 
-### A. Application Rollback (Instant)
-Because Vercel creates immutable, atomic deployments for every commit:
-1. Open the **Vercel Dashboard ➔ Deployments**.
-2. Locate the previously healthy production deployment.
-3. Click the three dots `...` ➔ Select **Rollback to this Deployment** (or **Promote to Production**).
-4. Vercel instantly points traffic to the previous healthy bundle in < 2 seconds.
-
-### B. Database Schema Evolution: Expand / Contract Pattern
-Prisma ORM does **not** support automated rollback of arbitrary SQL migrations. To guarantee safe zero-downtime database changes:
-1. **Phase 1 (Expand)**: Add new nullable columns, new tables, or new enums. Deploy application code that reads new fields while continuing to write old fields if needed.
-2. **Phase 2 (Migrate Data)**: Backfill data in the background without locking tables.
-3. **Phase 3 (Contract)**: Deploy application code that exclusively uses the new schema. In a subsequent migration, safely remove deprecated columns or tables.
-
-> [!IMPORTANT]
-> Never write destructive migrations (e.g. `DROP COLUMN`, `RENAME COLUMN`) in the same release as application code changes that depend on them.
+```bash
+npx tsx scripts/smoke-health.ts https://olvyn.onrender.com
+```
 
 ---
 
-## 9. First Production Deployment Checklist
+## 8. First Production Deployment Checklist
 
-Before triggering the first production release:
+- [ ] Supabase PostgreSQL project provisioned and accessible
+- [ ] Supabase Storage bucket `course-assets` created
+- [ ] `npx prisma migrate deploy` run against production database (using `DIRECT_URL`)
+- [ ] GitHub repository `Manojgowda12/Olvyn` connected to Render service
+- [ ] All environment variables configured in Render (Section 3)
+- [ ] `AUTH_SECRET` is a high-entropy string ≥ 32 characters
+- [ ] `NEXT_PUBLIC_APP_URL` set to actual Render URL (NOT localhost)
+- [ ] Supabase Auth: Site URL and Redirect URL configured (Section 4)
+- [ ] Google Cloud Console: Supabase redirect URI added (Section 4)
+- [ ] Render build succeeds and `/api/health` returns `200 OK`
+- [ ] Google OAuth tested end-to-end in production browser
 
-- [ ] **Supabase PostgreSQL Provisioned**: Ensure database is active in target region.
-- [ ] **Supabase Storage Buckets Created**: Ensure storage is configured and accessible.
-- [ ] **Prisma Migrations Applied**: Run `npx prisma migrate deploy` using `DIRECT_URL`.
-- [ ] **Vercel Project Connected**: GitHub repository imported into Vercel with Next.js preset.
-- [ ] **Environment Variables Configured**: All 11 variables from Section 4 configured in Vercel settings.
-- [ ] **AUTH_SECRET Generated**: High-entropy 32+ character string configured in Vercel.
-- [ ] **GitHub Branch Protection Enabled**: `main` protected, requiring `validate-and-build` CI job.
-- [ ] **Production Health Checked**: `npx tsx scripts/smoke-health.ts https://[DEPLOYMENT_URL]` passes with HTTP 200.
+---
+
+## 9. Rollback Procedure
+
+### Application Rollback
+
+Render keeps a deployment history. To roll back:
+
+1. Go to **Render Dashboard → Your Service → Deploys**
+2. Find the previous healthy deployment
+3. Click **Rollback to this deploy**
+
+Render atomically re-points traffic in seconds.
+
+### Database Rollback
+
+Prisma does NOT support automatic migration rollback. Follow the **Expand/Contract pattern**:
+
+1. **Expand**: Add new nullable columns/tables. Deploy code that supports both old and new schema.
+2. **Migrate**: Backfill data with no table locks.
+3. **Contract**: In a subsequent release, remove deprecated schema with a new migration.
+
+> [!CAUTION]
+> Never write destructive migrations (`DROP COLUMN`, `DROP TABLE`) in the same commit as code that depends on them.
+
+---
+
+## 10. Troubleshooting
+
+| Symptom | Likely Cause | Action |
+|---|---|---|
+| `/api/health` returns 503 | Database unreachable | Verify `DATABASE_URL`, check Supabase status |
+| Google OAuth redirects to login with error | Supabase redirect URL mismatch | Verify Site URL + Redirect URL in Supabase Dashboard |
+| `AUTH_SECRET is not configured in production` | Missing `AUTH_SECRET` in Render env | Add `AUTH_SECRET` in Render environment settings |
+| Prisma client not found | `prisma generate` not in build command | Verify build command includes `npx prisma generate` |
+| Build fails: TypeScript errors | Uncommitted type regression | Run `npx tsc --noEmit` locally and fix errors before pushing |
+| Session lost on page refresh | `NEXT_PUBLIC_APP_URL` set to localhost in production | Update `NEXT_PUBLIC_APP_URL` to production Render URL |
+| Cookies not set (secure=false in prod) | `NEXT_PUBLIC_APP_URL` includes `localhost` | Set `NEXT_PUBLIC_APP_URL` to the actual production HTTPS URL |

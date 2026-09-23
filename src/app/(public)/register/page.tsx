@@ -40,24 +40,39 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50">
-      <div className="w-full max-w-md">
+    <div className="min-h-[90dvh] flex items-center justify-center px-4 py-12 relative overflow-hidden" style={{ background: "var(--bg-base)" }}>
+      {/* Background ambient aurora lighting */}
+      <div className="aurora-1" style={{ top: "-50px", left: "20%" }} />
+      <div className="aurora-2" style={{ bottom: "0px", right: "15%" }} />
+
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900 text-[#d2f835] shadow-md mb-4 hover:scale-105 transition-transform">
-            <BookOpen className="w-6 h-6 text-[#d2f835]" />
+          <Link href="/" className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-500/35 text-cyan-400 shadow-[0_0_20px_rgba(37,99,235,0.3)] mb-4 hover:scale-105 transition-transform tactile-button">
+            <BookOpen className="w-6 h-6 text-cyan-400" />
           </Link>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">Create your account</h1>
-          <p className="text-sm font-medium text-slate-600 mt-1.5">
+          <div className="text-[11px] font-mono uppercase tracking-widest text-[#00F0FF] mb-1.5">
+            ONBOARDING // FREE ACCESS
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#F5F7FF]">Create your account</h1>
+          <p className="text-sm font-medium text-[#A8B4CC] mt-1.5">
             Join OLVYN to explore courses, track your 0-100% progress, and get Nova AI tutoring
           </p>
         </div>
 
         {/* Card */}
-        <div className="p-7 sm:p-9 rounded-3xl bg-white border border-slate-200/80 shadow-[0_8px_30px_rgba(15,23,42,0.06)]">
+        <div
+          className="p-7 sm:p-9 rounded-3xl border transition-all"
+          style={{
+            background: "rgba(10, 18, 36, 0.8)",
+            borderColor: "rgba(255, 255, 255, 0.09)",
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 48px -15px rgba(0, 0, 0, 0.65)",
+            backdropFilter: "blur(16px)",
+          }}
+        >
           {error && (
-            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <div className="mb-6 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-xs font-semibold flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -65,7 +80,7 @@ export default function RegisterPage() {
           {/* Google Sign In */}
           <a
             href="/api/auth/google?next=/dashboard"
-            className="w-full py-3 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm border border-slate-200/90 shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer mb-5 active:scale-[0.99]"
+            className="w-full py-3 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-[#F5F7FF] font-semibold text-sm border border-white/10 shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer mb-5 tactile-button active:scale-[0.98]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -77,65 +92,65 @@ export default function RegisterPage() {
           </a>
 
           <div className="relative flex py-1 items-center mb-5">
-            <div className="flex-grow border-t border-slate-200"></div>
-            <span className="flex-shrink mx-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Or register with email</span>
-            <div className="flex-grow border-t border-slate-200"></div>
+            <div className="flex-grow border-t border-white/[0.08]"></div>
+            <span className="flex-shrink mx-3 text-[10px] font-mono font-bold text-[#7F8CA8] uppercase tracking-wider">Or register with email</span>
+            <div className="flex-grow border-t border-white/[0.08]"></div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" suppressHydrationWarning>
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-800 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#A8B4CC] mb-1.5">
                 Full Name
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-[#7F8CA8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Alex Morgan"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#050816]/75 border border-white/10 text-[#F5F7FF] placeholder-[#7F8CA8] text-sm font-medium focus:bg-[#070d1e] focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
                   suppressHydrationWarning
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#A8B4CC] mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-[#7F8CA8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex@example.com"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#050816]/75 border border-white/10 text-[#F5F7FF] placeholder-[#7F8CA8] text-sm font-medium focus:bg-[#070d1e] focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
                   suppressHydrationWarning
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#121417] mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#A8B4CC] mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#7F8CA8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50/80 border border-slate-200 text-[#121417] placeholder-slate-400 text-sm font-medium focus:bg-white focus:outline-none focus:border-[#121417] focus:ring-1 focus:ring-[#121417] transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#050816]/75 border border-white/10 text-[#F5F7FF] placeholder-[#7F8CA8] text-sm font-medium focus:bg-[#070d1e] focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all"
                   suppressHydrationWarning
                 />
               </div>
-              <p className="text-[11px] font-medium text-slate-400 mt-1.5">
+              <p className="text-[11px] font-mono text-[#7F8CA8] mt-1.5">
                 Must be at least 8 characters with 1 number and 1 capital letter.
               </p>
             </div>
@@ -143,7 +158,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3.5 px-4 rounded-full bg-[#121417] hover:bg-black disabled:opacity-60 text-[#d2f835] font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+              className="w-full mt-2 py-3.5 px-4 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:opacity-60 text-white font-bold text-sm shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer tactile-button"
               suppressHydrationWarning
             >
               <span>{isLoading ? "Creating account..." : "Create Free Account"}</span>
@@ -153,9 +168,9 @@ export default function RegisterPage() {
         </div>
 
         {/* Footer Link */}
-        <p className="text-center text-sm font-medium text-slate-500 mt-6">
+        <p className="text-center text-sm font-medium text-[#7F8CA8] mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#121417] hover:underline font-bold">
+          <Link href="/login" className="text-cyan-400 hover:text-cyan-300 font-bold">
             Sign in
           </Link>
         </p>

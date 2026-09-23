@@ -71,13 +71,17 @@ export function getSessionCookieOptions() {
   };
 }
 
-export async function createSession(payload: SessionPayload): Promise<string> {
+export async function signSessionToken(payload: SessionPayload): Promise<string> {
   const secret = getJwtSecret();
-  const token = await new SignJWT({ ...payload })
+  return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_DURATION}s`)
     .sign(secret);
+}
+
+export async function createSession(payload: SessionPayload): Promise<string> {
+  const token = await signSessionToken(payload);
 
   try {
     const cookieStore = await cookies();

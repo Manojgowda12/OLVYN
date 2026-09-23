@@ -50,33 +50,39 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   const isAllActive = !category || category === "all" || !categories.some(isCatActive);
 
   return (
-    <div className="min-h-screen text-[#F5F7FF] py-10 px-6 lg:px-12 max-w-7xl mx-auto w-full" style={{ background: "var(--bg-base)" }}>
+    <div className="min-h-[100dvh] text-[#F5F7FF] py-10 px-6 lg:px-12 max-w-7xl mx-auto w-full" style={{ background: "var(--bg-base)" }}>
       {/* Top Filter & Search Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-blue-500/20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-white/[0.08]">
         <div>
-          <div className="text-[11px] font-bold uppercase tracking-widest text-[#00F0FF] mb-1">
-            Open Syllabus Catalog
+          <div className="text-[11px] font-mono uppercase tracking-widest text-[#00F0FF] mb-1.5">
+            OPEN_SYLLABUS // COURSE_INDEX
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#F5F7FF]">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#F5F7FF]">
             {q ? `Search results for "${q}"` : "Explore All Courses"}
           </h1>
         </div>
 
-        {/* Compact Search Bar Pill */}
+        {/* Compact Search Bar Pill — Liquid Glass */}
         <form
           method="GET"
           action="/explore"
-          className="flex items-center p-1.5 bg-[#0d1629] rounded-full border border-blue-500/30 shadow-md hover:border-blue-400/50 transition-all w-full md:w-auto"
+          className="flex items-center p-1.5 rounded-full border transition-all w-full md:w-auto"
+          style={{
+            background: "rgba(10, 18, 36, 0.8)",
+            borderColor: "rgba(255, 255, 255, 0.1)",
+            boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px -6px rgba(0, 0, 0, 0.4)",
+            backdropFilter: "blur(12px)",
+          }}
           suppressHydrationWarning
         >
-          <div className="flex items-center pl-3 gap-2 flex-1">
+          <div className="flex items-center pl-3.5 gap-2.5 flex-1">
             <Search className="w-4 h-4 text-[#7F8CA8]" />
             <input
               type="text"
               name="q"
               defaultValue={q}
               placeholder="Search topics or skills..."
-              className="text-sm text-[#F5F7FF] placeholder:text-[#7F8CA8] bg-transparent focus:outline-none w-full md:w-60 py-1"
+              className="text-sm text-[#F5F7FF] placeholder:text-[#7F8CA8] bg-transparent focus:outline-none w-full md:w-64 py-1"
               suppressHydrationWarning
             />
           </div>
@@ -84,7 +90,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
           {difficulty !== "all" && <input type="hidden" name="difficulty" value={difficulty} />}
           <button
             type="submit"
-            className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 flex items-center justify-center text-white flex-shrink-0 transition-colors shadow-sm cursor-pointer"
+            className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 flex items-center justify-center text-white flex-shrink-0 transition-colors shadow-sm cursor-pointer tactile-button"
             suppressHydrationWarning
           >
             <Search className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -93,13 +99,13 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
       </div>
 
       {/* Category Pills Strip */}
-      <div className="flex items-center gap-2.5 overflow-x-auto py-4 scrollbar-none border-b border-blue-500/15">
+      <div className="flex items-center gap-2.5 overflow-x-auto py-4 scrollbar-none border-b border-white/[0.06]">
         <Link
           href={`/explore?${new URLSearchParams({ ...(q ? { q } : {}), ...(difficulty !== "all" ? { difficulty } : {}), category: "all" })}`}
-          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap tactile-button ${
             isAllActive
-              ? "bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)] border border-blue-400/40"
-              : "bg-[#0d1629] text-[#A8B4CC] border border-blue-500/20 hover:border-blue-400/40 hover:text-white"
+              ? "bg-white/[0.1] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(0,0,0,0.3)] border border-white/20"
+              : "bg-[#0d1629]/70 text-[#A8B4CC] border border-white/[0.08] hover:border-white/20 hover:text-white"
           }`}
         >
           All Topics
@@ -110,30 +116,30 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
             <Link
               key={cat.id}
               href={`/explore?${new URLSearchParams({ ...(q ? { q } : {}), ...(difficulty !== "all" ? { difficulty } : {}), category: cat.slug })}`}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap tactile-button ${
                 active
-                  ? "bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)] border border-blue-400/40"
-                  : "bg-[#0d1629] text-[#A8B4CC] border border-blue-500/20 hover:border-blue-400/40 hover:text-white"
+                  ? "bg-white/[0.1] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(0,0,0,0.3)] border border-white/20"
+                  : "bg-[#0d1629]/70 text-[#A8B4CC] border border-white/[0.08] hover:border-white/20 hover:text-white"
               }`}
             >
-              {cat.name} <span className="opacity-60 text-[10px]">({cat._count.courses})</span>
+              {cat.name} <span className="opacity-70 font-mono text-[10px]">({cat._count.courses})</span>
             </Link>
           );
         })}
       </div>
 
       {/* Difficulty Filters */}
-      <div className="flex items-center justify-between py-4 text-xs">
+      <div className="flex items-center justify-between py-4 text-xs font-mono">
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="font-semibold text-[#7F8CA8] mr-1">Difficulty:</span>
+          <span className="font-semibold text-[#7F8CA8] mr-1">DIFFICULTY:</span>
           {["all", "BEGINNER", "INTERMEDIATE", "ADVANCED", "ALL_LEVELS"].map((diff) => (
             <Link
               key={diff}
               href={`/explore?${new URLSearchParams({ ...(q ? { q } : {}), ...(category !== "all" ? { category } : {}), difficulty: diff })}`}
-              className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${
+              className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase transition-all whitespace-nowrap tactile-button ${
                 difficulty === diff
-                  ? "bg-cyan-950/60 text-[#00F0FF] border border-cyan-500/40 shadow-xs"
-                  : "bg-[#0d1629] text-[#7F8CA8] border border-blue-500/20 hover:border-blue-400/30 hover:text-white"
+                  ? "bg-cyan-950/70 text-[#00F0FF] border border-cyan-500/40 shadow-xs"
+                  : "bg-[#0d1629]/70 text-[#7F8CA8] border border-white/[0.08] hover:border-white/20 hover:text-white"
               }`}
             >
               {diff === "all" ? "All Levels" : diff.replace("_", " ")}
@@ -171,10 +177,16 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
               <Link
                 key={course.id}
                 href={`/courses/${course.slug}`}
-                className="group flex flex-col p-3 rounded-2xl bg-[#0d1629] border border-blue-500/20 hover:border-blue-400/40 hover:bg-[#101e35] shadow-sm hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300"
+                className="group flex flex-col p-3.5 rounded-3xl transition-all duration-300 tactile-button hover:-translate-y-1 hover:border-cyan-400/40"
+                style={{
+                  background: "rgba(10, 17, 34, 0.72)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 36px -12px rgba(0, 0, 0, 0.5)",
+                  backdropFilter: "blur(12px)",
+                }}
               >
                 {/* Image plate — Contained with explicit aspect-[4/3] */}
-                <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#07101f] border border-blue-500/20 mb-3.5">
+                <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-[#07101f] border border-white/[0.08] mb-3.5">
                   {course.thumbnailUrl ? (
                     <Image
                       src={course.thumbnailUrl}
@@ -191,13 +203,13 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
 
                   {/* Difficulty Badge */}
                   <div className="absolute top-2.5 left-2.5">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#050816]/85 backdrop-blur-md text-[#00F0FF] shadow-xs border border-cyan-500/40">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#050816]/85 backdrop-blur-md text-[#00F0FF] shadow-xs border border-cyan-500/40">
                       {course.difficulty ? course.difficulty.replace("_", " ") : "All Levels"}
                     </span>
                   </div>
 
                   <div className="absolute top-2.5 right-2.5">
-                    <div className="w-7 h-7 rounded-full bg-black/40 backdrop-blur-md text-white/80 flex items-center justify-center hover:scale-110 active:scale-95 transition-transform">
+                    <div className="w-7 h-7 rounded-full bg-black/50 backdrop-blur-md text-white/80 flex items-center justify-center hover:scale-110 active:scale-95 transition-transform">
                       <Heart className="w-4 h-4" />
                     </div>
                   </div>
@@ -207,10 +219,10 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
                 <div className="px-1.5 pb-1 flex-1 flex flex-col justify-between space-y-2.5">
                   <div>
                     <div className="flex items-center justify-between text-xs text-[#7F8CA8] font-medium mb-1">
-                      <span className="truncate text-[#00F0FF] font-semibold">{course.category?.name || "Open Studies"}</span>
-                      <div className="flex items-center gap-1 text-[#F5F7FF] font-semibold">
+                      <span className="truncate text-[#00F0FF] font-mono text-[11px] font-semibold">{course.category?.name || "Open Studies"}</span>
+                      <div className="flex items-center gap-1 text-[#F5F7FF] font-semibold font-mono text-xs">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span>{rating}</span>
+                        <span className="metric-mono">{rating}</span>
                       </div>
                     </div>
 
@@ -219,15 +231,15 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
                     </h3>
                   </div>
 
-                  <div className="pt-2 border-t border-blue-500/15 flex items-center justify-between text-xs text-[#A8B4CC]">
-                    <div className="flex items-center gap-1">
+                  <div className="pt-2.5 border-t border-white/[0.08] flex items-center justify-between text-xs text-[#A8B4CC] font-mono">
+                    <div className="flex items-center gap-1.5">
                       <BookOpen className="w-3.5 h-3.5 text-[#7F8CA8]" />
-                      <span>{totalLessons} lessons</span>
+                      <span className="metric-mono">{totalLessons} lessons</span>
                     </div>
                     {course.estimatedHours ? (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-[#7F8CA8]" />
-                        <span>{course.estimatedHours}h</span>
+                        <span className="metric-mono">{course.estimatedHours}h</span>
                       </div>
                     ) : null}
                   </div>

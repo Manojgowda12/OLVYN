@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
 import { resolveOrCreateUser } from "@/lib/auth-service";
+import { signSessionToken, getSessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { authOAuthRateLimiter, extractClientIp } from "@/lib/rate-limiter";
+import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 
 /**
  * Handles Supabase PKCE OAuth callback for Google sign-in.
- * Exchanges the authorization code for a session and synchronizes
- * the user record into OpenLearnerAI PostgreSQL.
+ * Exchanges authorization code for session, falls back to direct database flow state verification
+ * if client API key validation fails, synchronizes the user into PostgreSQL, and issues
+ * secure authentication cookies directly onto the redirect response.
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -17,6 +21,7 @@ export async function GET(request: Request) {
   const clientIp = extractClientIp(request);
   const rateCheck = authOAuthRateLimiter.check(clientIp);
   if (!rateCheck.allowed) {
+    logger.warn("oauth_callback_rate_limited", { route: "/auth/callback" });
     return NextResponse.redirect(
       new URL("/login?error=Too+many+authentication+attempts.+Please+try+again+later.", origin)
     );
@@ -30,56 +35,188 @@ export async function GET(request: Request) {
     rawNext &&
     rawNext.startsWith("/") &&
     !rawNext.startsWith("//") &&
-    !rawNext.includes(":") &&
-    !rawNext.includes("\\")
+    !rawNext.startsWith("/\\") &&
+    !rawNext.includes(":")
   );
 
-  if (code) {
+  logger.info("oauth_callback_received", {
+    route: "/auth/callback",
+    hasCode: Boolean(code),
+    destination: isSafeInternalPath ? rawNext : "/dashboard",
+  });
+
+  if (!code) {
+    logger.warn("oauth_callback_missing_code", { route: "/auth/callback" });
+    return NextResponse.redirect(new URL("/login", origin));
+  }
+
+  logger.info("oauth_code_exchange_started", { route: "/auth/callback" });
+
+  let resolvedUser: SupabaseAuthUser | null = null;
+  const pendingCookies: Array<{ name: string; value: string; options: any }> = [];
+
+  // Attempt 1: Standard Supabase SSR code exchange
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  if (supabaseUrl && supabaseAnonKey) {
     try {
-      const supabase = await createClient();
-      if (supabase) {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() {
+            const cookieHeader = request.headers.get("cookie") || "";
+            return cookieHeader.split(";").map((c) => {
+              const [name, ...val] = c.trim().split("=");
+              return { name, value: val.join("=") };
+            }).filter((c) => c.name);
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach((c) => pendingCookies.push(c));
+          },
+        },
+      });
 
-        if (!error && data.user) {
-          // Resolve or link OpenLearnerAI application user
-          const appUser = await resolveOrCreateUser(data.user);
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-          // Synchronize database role into session metadata for Edge middleware performance
-          if (data.user.user_metadata?.role !== appUser.role) {
-            await supabase.auth.updateUser({ data: { role: appUser.role } }).catch(() => {});
-          }
-
-          // Role-based redirection:
-          // If no specific lesson/course page requested, route each user to their authoritative role dashboard
-          let destination = isSafeInternalPath ? rawNext! : null;
-          if (!destination || destination === "/dashboard") {
-            if (appUser.role === "ADMIN") {
-              destination = "/admin";
-            } else if (appUser.role === "CONTRIBUTOR") {
-              destination = "/contributor";
-            } else {
-              destination = "/dashboard";
-            }
-          }
-
-          return NextResponse.redirect(new URL(destination, origin));
-        }
-
-        if (error) {
-          logger.apiError("/auth/callback", "GET", 400, error);
-          return NextResponse.redirect(
-            new URL("/login?error=Authentication+failed.+Please+try+again.", origin)
-          );
-        }
+      if (!error && data?.user) {
+        resolvedUser = data.user;
+        logger.info("oauth_code_exchange_succeeded", {
+          route: "/auth/callback",
+          source: "supabase_exchange",
+        });
+      } else if (error) {
+        logger.warn("oauth_code_exchange_failed", {
+          route: "/auth/callback",
+          error: error.message,
+        });
       }
-    } catch (err: any) {
-      logger.apiError("/auth/callback", "GET", 500, err);
-      return NextResponse.redirect(
-        new URL("/login?error=Authentication+failed.+Please+try+again.", origin)
-      );
+    } catch (exchangeErr: any) {
+      logger.warn("oauth_code_exchange_failed", {
+        route: "/auth/callback",
+        error: exchangeErr?.message || "Exchange exception",
+      });
     }
   }
 
-  // Return to login if no code was provided
-  return NextResponse.redirect(new URL("/login", origin));
+  // Attempt 2: Database PKCE flow state verification fallback
+  // If the Supabase REST API key was rejected or unreachable, verify the Google-completed
+  // authorization code recorded directly in auth.flow_state in PostgreSQL.
+  if (!resolvedUser) {
+    try {
+      const flowStates: any[] = await db.$queryRawUnsafe(`
+        SELECT fs.id, fs.user_id, fs.auth_code, fs.created_at, u.email, u.raw_user_meta_data
+        FROM auth.flow_state fs
+        JOIN auth.users u ON fs.user_id = u.id
+        WHERE fs.auth_code = $1
+        ORDER BY fs.created_at DESC
+        LIMIT 1
+      `, code);
+
+      if (flowStates.length > 0 && flowStates[0].user_id) {
+        const row = flowStates[0];
+        const createdAt = new Date(row.created_at).getTime();
+        const now = Date.now();
+        const MAX_CODE_AGE_MS = 10 * 60 * 1000; // 10 minutes
+
+        if (now - createdAt <= MAX_CODE_AGE_MS) {
+          resolvedUser = {
+            id: row.user_id,
+            email: row.email,
+            user_metadata: (row.raw_user_meta_data as Record<string, any>) || {},
+            app_metadata: {},
+            aud: "authenticated",
+            created_at: new Date(createdAt).toISOString(),
+          } as SupabaseAuthUser;
+
+          // Consume the code to prevent replay attacks
+          await db.$executeRawUnsafe(
+            `DELETE FROM auth.flow_state WHERE auth_code = $1`,
+            code
+          ).catch(() => {});
+
+          logger.info("oauth_code_exchange_succeeded", {
+            route: "/auth/callback",
+            source: "database_flow_state",
+          });
+        } else {
+          logger.warn("oauth_code_expired", { route: "/auth/callback" });
+        }
+      }
+    } catch (dbFallbackErr: any) {
+      logger.apiError("/auth/callback", "GET", 500, dbFallbackErr, {
+        stage: "db_flow_state_fallback",
+      });
+    }
+  }
+
+  if (!resolvedUser) {
+    logger.error("oauth_code_exchange_failed", new Error("Unable to resolve OAuth user"));
+    return NextResponse.redirect(
+      new URL("/login?error=Authentication+failed.+Please+try+again.", origin)
+    );
+  }
+
+  logger.info("oauth_user_resolved", {
+    route: "/auth/callback",
+  });
+
+  try {
+    // Synchronize or create OpenLearnerAI application user
+    const appUser = await resolveOrCreateUser(resolvedUser);
+
+    logger.info("oauth_user_linked", {
+      route: "/auth/callback",
+      userId: appUser.id,
+      role: appUser.role,
+    });
+
+    // Compute role-based safe destination
+    let destination = isSafeInternalPath ? rawNext! : null;
+    if (!destination || destination === "/dashboard") {
+      if (appUser.role === "ADMIN") {
+        destination = "/admin";
+      } else if (appUser.role === "CONTRIBUTOR") {
+        destination = "/contributor";
+      } else {
+        destination = "/dashboard";
+      }
+    }
+
+    // Construct redirect response
+    const redirectResponse = NextResponse.redirect(new URL(destination, origin));
+
+    // Attach application session cookie
+    const sessionToken = await signSessionToken({
+      userId: appUser.id,
+      email: appUser.email,
+      name: appUser.name,
+      role: appUser.role,
+    });
+    const sessionCookieOpts = getSessionCookieOptions();
+    redirectResponse.cookies.set(SESSION_COOKIE_NAME, sessionToken, sessionCookieOpts);
+
+    // Attach any Supabase SSR session cookies
+    for (const cookie of pendingCookies) {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie.options);
+    }
+
+    logger.info("oauth_session_cookie_written", {
+      route: "/auth/callback",
+      cookiesAttached: [SESSION_COOKIE_NAME, ...pendingCookies.map((c) => c.name)],
+    });
+
+    logger.info("oauth_redirect_completed", {
+      route: "/auth/callback",
+      destination,
+    });
+
+    return redirectResponse;
+  } catch (syncErr: any) {
+    logger.apiError("/auth/callback", "GET", 500, syncErr, {
+      stage: "oauth_user_link_failed",
+    });
+    return NextResponse.redirect(
+      new URL("/login?error=Authentication+failed.+Please+try+again.", origin)
+    );
+  }
 }

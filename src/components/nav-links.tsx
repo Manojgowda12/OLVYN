@@ -34,14 +34,14 @@ export function NavLinks({ session }: NavLinksProps) {
   return (
     <>
       {/* Desktop Navigation Links */}
-      <nav className="hidden md:flex items-center gap-1 lg:gap-2 text-[13px]" aria-label="Main Navigation">
+      <nav className="hidden md:flex items-center gap-1 lg:gap-1.5 text-[13px]" aria-label="Main Navigation">
         <Link
           href="/"
           prefetch={true}
-          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 tactile-button ${
             isHomeActive
-              ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
-              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
+              ? "text-[#F5F7FF] bg-white/[0.08] border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_10px_rgba(0,0,0,0.3)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#F5F7FF] hover:bg-white/[0.05] border border-transparent font-medium"
           }`}
           aria-current={isHomeActive ? "page" : undefined}
         >
@@ -51,10 +51,10 @@ export function NavLinks({ session }: NavLinksProps) {
         <Link
           href="/explore"
           prefetch={true}
-          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 tactile-button ${
             isExploreActive
-              ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
-              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
+              ? "text-[#F5F7FF] bg-white/[0.08] border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_10px_rgba(0,0,0,0.3)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#F5F7FF] hover:bg-white/[0.05] border border-transparent font-medium"
           }`}
           aria-current={isExploreActive ? "page" : undefined}
         >
@@ -65,10 +65,10 @@ export function NavLinks({ session }: NavLinksProps) {
           <Link
             href="/dashboard"
             prefetch={true}
-            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
+            className={`px-3.5 py-1.5 rounded-full transition-all duration-200 tactile-button ${
               isDashboardActive
-                ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
-                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
+                ? "text-[#F5F7FF] bg-white/[0.08] border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_10px_rgba(0,0,0,0.3)] font-semibold"
+                : "text-[#A8B4CC] hover:text-[#F5F7FF] hover:bg-white/[0.05] border border-transparent font-medium"
             }`}
             aria-current={isDashboardActive ? "page" : undefined}
           >
@@ -79,10 +79,10 @@ export function NavLinks({ session }: NavLinksProps) {
         <Link
           href="/contributor"
           prefetch={true}
-          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full transition-all duration-200 tactile-button ${
             isStudioActive
-              ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
-              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
+              ? "text-[#F5F7FF] bg-white/[0.08] border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_10px_rgba(0,0,0,0.3)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#F5F7FF] hover:bg-white/[0.05] border border-transparent font-medium"
           }`}
           aria-current={isStudioActive ? "page" : undefined}
         >
@@ -93,10 +93,10 @@ export function NavLinks({ session }: NavLinksProps) {
           <Link
             href="/admin"
             prefetch={true}
-            className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 ${
+            className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all duration-200 tactile-button ${
               isAdminActive
-                ? "text-[#F5F7FF] bg-blue-600/20 border border-blue-500/40 shadow-[0_0_12px_rgba(37,99,235,0.25)] font-semibold"
-                : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
+                ? "text-[#F5F7FF] bg-white/[0.08] border border-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_2px_10px_rgba(0,0,0,0.3)] font-semibold"
+                : "text-[#A8B4CC] hover:text-[#F5F7FF] hover:bg-white/[0.05] border border-transparent font-medium"
             }`}
             aria-current={isAdminActive ? "page" : undefined}
           >
@@ -108,16 +108,20 @@ export function NavLinks({ session }: NavLinksProps) {
         <Link
           href="/nova"
           prefetch={true}
-          className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 transition-all duration-200 tactile-button ${
             isNovaActive
-              ? "text-[#F5F7FF] bg-cyan-600/20 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.25)] font-semibold"
-              : "text-[#A8B4CC] hover:text-[#EAF2FF] hover:bg-white/[0.06] border border-transparent font-medium"
+              ? "text-[#F5F7FF] bg-cyan-500/15 border border-cyan-400/30 shadow-[inset_0_1px_0_rgba(6,182,212,0.2),0_2px_12px_rgba(6,182,212,0.25)] font-semibold"
+              : "text-[#A8B4CC] hover:text-[#F5F7FF] hover:bg-white/[0.05] border border-transparent font-medium"
           }`}
           aria-current={isNovaActive ? "page" : undefined}
         >
           <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
           <span>Nova AI</span>
-          <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/35 text-cyan-300">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-400"></span>
+            </span>
             Live
           </span>
         </Link>

@@ -24,17 +24,17 @@ export async function Navbar() {
           background: "rgba(5, 8, 22, 0.82)",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(37, 99, 235, 0.2)",
-          boxShadow: "0 1px 0 rgba(37, 99, 235, 0.1)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          boxShadow: "inset 0 -1px 0 rgba(255, 255, 255, 0.04), 0 4px 24px rgba(0, 0, 0, 0.35)",
         }}
       >
         <div className="max-w-7xl mx-auto h-[72px] px-6 lg:px-12 flex items-center justify-between">
           {/* Brand Logo + Wordmark */}
-          <Link href="/" prefetch={true} className="flex items-center gap-3 group">
+          <Link href="/" prefetch={true} className="flex items-center gap-3 group tactile-button">
             <div
-              className="w-9 h-9 rounded-xl flex-shrink-0 overflow-hidden transition-all duration-200"
+              className="w-9 h-9 rounded-xl flex-shrink-0 overflow-hidden transition-all duration-200 group-hover:scale-105"
               style={{
-                boxShadow: "0 0 0 1px rgba(37,99,235,0.35), 0 4px 14px rgba(37,99,235,0.25)",
+                boxShadow: "0 0 0 1px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 14px rgba(37,99,235,0.3)",
               }}
             >
               <Image
@@ -47,7 +47,7 @@ export async function Navbar() {
               />
             </div>
             <span
-              className="font-extrabold text-[20px] tracking-tight"
+              className="font-extrabold text-[20px] tracking-tight group-hover:text-blue-200 transition-colors"
               style={{ color: "#F5F7FF" }}
             >
               OLVYN
@@ -64,7 +64,8 @@ export async function Navbar() {
                 className="flex items-center gap-2.5 pl-2.5 pr-2 py-1.5 rounded-full"
                 style={{
                   background: "rgba(13, 22, 41, 0.85)",
-                  border: "1px solid rgba(59, 130, 246, 0.35)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.3)",
                   backdropFilter: "blur(12px)",
                 }}
               >
@@ -77,19 +78,19 @@ export async function Navbar() {
                       : "/dashboard"
                   }
                   prefetch={true}
-                  className="flex items-center gap-2 group"
+                  className="flex items-center gap-2 group tactile-button"
                 >
                   <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black uppercase text-white"
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black uppercase text-white group-hover:scale-105 transition-transform"
                     style={{
                       background: "linear-gradient(135deg, #1d4ed8, #0891b2)",
-                      boxShadow: "0 0 10px rgba(37,99,235,0.5)",
+                      boxShadow: "0 0 12px rgba(37,99,235,0.5)",
                     }}
                   >
                     {session.name.charAt(0)}
                   </div>
                   <span
-                    className="text-xs font-bold max-w-[90px] truncate hidden sm:inline-block"
+                    className="text-xs font-bold max-w-[90px] truncate hidden sm:inline-block group-hover:text-blue-300 transition-colors"
                     style={{ color: "#F5F7FF" }}
                   >
                     {session.name.split(" ")[0]}
@@ -99,7 +100,7 @@ export async function Navbar() {
                   <button
                     type="submit"
                     title="Sign Out"
-                    className="p-1 rounded-full transition-colors hover:text-white"
+                    className="p-1 rounded-full transition-colors hover:text-white hover:bg-white/[0.08] tactile-button cursor-pointer"
                     style={{ color: "#7F8CA8" }}
                     suppressHydrationWarning
                   >
@@ -111,10 +112,11 @@ export async function Navbar() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/login"
-                  className="text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200"
+                  className="text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200 tactile-button hover:border-white/20 hover:text-white"
                   style={{
                     background: "rgba(13, 22, 41, 0.75)",
-                    border: "1px solid rgba(59, 130, 246, 0.45)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08)",
                     color: "#F5F7FF",
                     backdropFilter: "blur(10px)",
                   }}
@@ -123,10 +125,10 @@ export async function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="text-xs font-bold px-5 py-2 rounded-full text-white transition-all duration-200"
+                  className="text-xs font-bold px-5 py-2 rounded-full text-white transition-all duration-200 tactile-button hover:opacity-95"
                   style={{
                     background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-                    boxShadow: "0 0 16px rgba(37,99,235,0.45), 0 2px 6px rgba(0,0,0,0.3)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25), 0 0 20px rgba(37,99,235,0.45), 0 2px 6px rgba(0,0,0,0.3)",
                   }}
                 >
                   Get Started

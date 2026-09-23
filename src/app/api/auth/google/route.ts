@@ -53,6 +53,11 @@ export async function GET(request: Request) {
       );
     }
 
+    logger.info("oauth_start", {
+      route: "/api/auth/google",
+      destination: next,
+    });
+
     return NextResponse.redirect(data.url);
   } catch (err: unknown) {
     logger.apiError("/api/auth/google", "GET", 500, err);

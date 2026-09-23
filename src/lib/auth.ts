@@ -10,6 +10,7 @@ import {
 } from "./auth-service";
 import {
   createSession as createLegacySession,
+  signSessionToken,
   getLegacySession,
   clearLegacySession,
   hashPassword,
@@ -25,6 +26,7 @@ export {
   requireRole,
   resolveOrCreateUser,
   createLegacySession,
+  signSessionToken,
   getSessionCookieOptions,
   SESSION_COOKIE_NAME,
   hashPassword,
