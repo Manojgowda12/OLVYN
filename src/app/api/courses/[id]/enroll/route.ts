@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { getRequestOrigin } from "@/lib/request-origin";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const origin = getRequestOrigin(req);
   const session = await getSession();
 
   if (!session) {
     // If user is not logged in, redirect to login page with return url
-    const loginUrl = new URL("/login", req.url);
+    const loginUrl = new URL("/login", origin);
     loginUrl.searchParams.set("redirect", req.headers.get("referer") || "/explore");
     return NextResponse.redirect(loginUrl, 303);
   }
@@ -79,5 +81,5 @@ export async function POST(
     ? `/learn/${course.slug}/${firstLesson.slug}`
     : `/courses/${course.slug}`;
 
-  return NextResponse.redirect(new URL(targetUrl, req.url), 303);
+  return NextResponse.redirect(new URL(targetUrl, origin), 303);
 }

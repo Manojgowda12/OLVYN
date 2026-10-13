@@ -5,6 +5,7 @@ import { signSessionToken, getSessionCookieOptions, SESSION_COOKIE_NAME } from "
 import { db } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { authOAuthRateLimiter, extractClientIp } from "@/lib/rate-limiter";
+import { getRequestOrigin } from "@/lib/request-origin";
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 
 /**
@@ -15,7 +16,7 @@ import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const origin = requestUrl.origin;
+  const origin = getRequestOrigin(request);
 
   // Rate Limiting Check
   const clientIp = extractClientIp(request);

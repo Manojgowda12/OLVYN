@@ -180,8 +180,26 @@ async function runAuthSecuritySuite() {
     // ==================================================================
     console.log("\n--- Group 3: Error Sanitization & Account Existence Isolation ---");
 
-    const safeIp1 = `safe-login-ip-1-${Date.now()}`;
-    const safeIp2 = `safe-login-ip-2-${Date.now()}`;
+    const { db } = await import("../src/lib/db");
+    const originalFindUnique = db.user.findUnique;
+    (db.user as any).findUnique = async ({ where }: any) => {
+      const email = where?.email?.toLowerCase?.() || where?.normalizedEmail?.toLowerCase?.();
+      if (email === "admin@openlearner.ai") {
+        return {
+          id: "mock-admin-id",
+          email: "admin@openlearner.ai",
+          normalizedEmail: "admin@openlearner.ai",
+          name: "Platform Administrator",
+          passwordHash: "$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQmG6e.C69ePtK28rK/uC", // Valid bcrypt hash
+          role: "ADMIN",
+        };
+      }
+      return null;
+    };
+
+    try {
+      const safeIp1 = `safe-login-ip-1-${Date.now()}`;
+      const safeIp2 = `safe-login-ip-2-${Date.now()}`;
 
     // 3.1 Non-existent user login
     const nonExistentReq = new NextRequest("http://localhost:3000/api/auth/login", {
@@ -240,6 +258,9 @@ async function runAuthSecuritySuite() {
     const stringifiedError = JSON.stringify(duplicateRegBody) + JSON.stringify(nonExistentBody);
     assert(!stringifiedError.includes("stack"), "Response bodies strictly omit stack trace property");
     assert(!stringifiedError.includes("prisma"), "Response bodies strictly omit internal ORM/database details");
+    } finally {
+      (db.user as any).findUnique = originalFindUnique;
+    }
 
     // ==================================================================
     // Group 4: Credential & Secret Redaction in Responses & Logs
@@ -332,6 +353,26 @@ async function runAuthSecuritySuite() {
       headers: { "x-forwarded-for": "203.0.113.195, 70.41.3.18" },
     });
     assert(extractClientIp(mockProxyReq) === "203.0.113.195", "extractClientIp parses first IP from x-forwarded-for");
+
+    // 5.5 Production Origin Resolution & Elimination of localhost:10000 Leaks
+    const { getRequestOrigin } = await import("../src/lib/request-origin");
+    const internalProxyReq = new Request("http://localhost:10000/api/auth/google", {
+      headers: {
+        "x-forwarded-host": "olvyn.onrender.com",
+        "x-forwarded-proto": "https",
+      },
+    });
+    assert(
+      getRequestOrigin(internalProxyReq) === "https://olvyn.onrender.com",
+      "getRequestOrigin resolves x-forwarded-host to production origin https://olvyn.onrender.com"
+    );
+
+    const internalBareReq = new Request("http://localhost:10000/api/auth/google");
+    const resolvedBare = getRequestOrigin(internalBareReq);
+    assert(
+      !resolvedBare.includes("10000"),
+      "getRequestOrigin never leaks port 10000 into origin fallback"
+    );
 
     // ==================================================================
     // Summary

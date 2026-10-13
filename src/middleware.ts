@@ -53,19 +53,26 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!isAuthenticated) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // 4. Role-based path gating (Defense-in-depth: pages also enforce DB roles)
   if (isAdminPath && resolvedRole !== "ADMIN") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/dashboard";
+    dashboardUrl.search = "";
+    return NextResponse.redirect(dashboardUrl);
   }
 
   const isContributorCourseMutation = pathname.startsWith("/contributor/courses");
   if (isContributorCourseMutation && resolvedRole !== "CONTRIBUTOR" && resolvedRole !== "ADMIN") {
-    return NextResponse.redirect(new URL("/contributor", request.url));
+    const contributorUrl = request.nextUrl.clone();
+    contributorUrl.pathname = "/contributor";
+    contributorUrl.search = "";
+    return NextResponse.redirect(contributorUrl);
   }
 
   return supabaseResponse;

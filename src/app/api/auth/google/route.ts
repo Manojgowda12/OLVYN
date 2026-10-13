@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import { authOAuthRateLimiter, extractClientIp } from "@/lib/rate-limiter";
+import { getRequestOrigin } from "@/lib/request-origin";
 
 /**
  * Initiates Google OAuth flow via Supabase Auth.
@@ -9,7 +10,7 @@ import { authOAuthRateLimiter, extractClientIp } from "@/lib/rate-limiter";
  */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const origin = requestUrl.origin;
+  const origin = getRequestOrigin(request);
 
   // Rate Limiting Check
   const clientIp = extractClientIp(request);
