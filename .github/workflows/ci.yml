@@ -52,13 +52,19 @@ jobs:
       - name: 5. Validate Prisma Schema
         run: npx prisma validate
 
-      - name: Generate Prisma Client types
+      - name: 6. Generate Prisma Client types
         run: npx prisma generate
 
-      - name: 6. Run TypeScript validation
+      - name: 7. Run production build
+        # next build also performs type checking and generates .next/types/routes.d.ts
+        # which is required by next-env.d.ts before tsc --noEmit can succeed
+        run: npm run build
+
+      - name: 8. Run TypeScript validation (post-build)
+        # Must run after build so that .next/types/routes.d.ts exists (referenced by next-env.d.ts)
         run: npx tsc --noEmit
 
-      - name: 7. Run automated test suites (Isolated Unit & Domain Logic)
+      - name: 9. Run automated test suites (Isolated Unit & Domain Logic)
         run: |
           echo "Running Chunking Unit Tests..."
           npx tsx scripts/test-chunking.ts
@@ -68,6 +74,3 @@ jobs:
           npx tsx scripts/test-health.ts
           echo "Running Authentication Security Tests..."
           npx tsx scripts/test-auth-security.ts
-
-      - name: 8. Run production build
-        run: npm run build
