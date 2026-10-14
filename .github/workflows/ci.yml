@@ -21,7 +21,6 @@ jobs:
 
     env:
       NEXT_TELEMETRY_DISABLED: 1
-      NODE_ENV: production
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/ci_placeholder?pgbouncer=true"
       DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/ci_placeholder"
       AUTH_SECRET: "ci_dummy_auth_secret_minimum_32_characters_long_for_build"
@@ -42,7 +41,7 @@ jobs:
           cache: "npm"
 
       - name: 3. Install dependencies
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: 4. Run dependency security audit
         run: |
@@ -58,6 +57,8 @@ jobs:
       - name: 7. Run production build
         # next build also performs type checking and generates .next/types/routes.d.ts
         # which is required by next-env.d.ts before tsc --noEmit can succeed
+        env:
+          NODE_ENV: production
         run: npm run build
 
       - name: 8. Run TypeScript validation (post-build)
